@@ -1,36 +1,73 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# DriveX — Car Decision Platform
+
+> Stop browsing. Start deciding.
+
+DriveX is an intelligent car-buying assistant built with **Next.js 15**, **TypeScript**, **Tailwind CSS v4**, and **ShadCN UI**. It helps users browse cars, compare specs side-by-side, get AI-powered recommendations, calculate EMIs, compare loan offers, and find the best insurance plans — all in one place.
+
+## Features
+
+- **Browse & Filter** — Explore new and used cars with live filters (budget, fuel type, body type, city usage)
+- **Compare** — Select up to 3 cars and compare specs, pros, and cons side-by-side
+- **AI Advisor** — Rule-based recommendation engine that understands natural language queries
+- **Loan Calculator** — EMI calculator with 7-lender loan comparison (SBI, HDFC, ICICI, Axis, Kotak, Bajaj, Tata Capital)
+- **Insurance Recommender** — 6-insurer comparison (HDFC ERGO, Bajaj Allianz, ICICI Lombard, Go Digit, New India, Tata AIG) with IDV and premium estimates
+- **Used Cars** — Dedicated used car listings with trust badges
+- **Dealer Contact** — Built-in lead form to connect with dealers
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Framework | Next.js 15 (App Router, Turbopack) |
+| Language | TypeScript |
+| Styling | Tailwind CSS v4 |
+| UI Components | ShadCN UI (Radix/Nova) |
+| State | React Context API |
+| Engines | Custom rule-based AI, Loan & Insurance engines |
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) to view the app.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Project Structure
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+drivex/
+├── app/
+│   ├── page.tsx              # Home — hero + journey cards
+│   ├── cars/page.tsx         # Browse with live filters
+│   ├── compare/page.tsx      # Side-by-side comparison
+│   ├── ai-advisor/page.tsx   # AI chat advisor
+│   ├── used-cars/page.tsx    # Used car listings
+│   └── loan-calculator/page.tsx  # 4-tab loan & insurance centre
+├── components/
+│   ├── navbar/
+│   ├── car-card/
+│   ├── compare-bar/
+│   ├── filters/
+│   ├── ai-chat/
+│   ├── dealer-form/
+│   ├── loan-comparison/
+│   └── insurance-recommendation/
+├── context/
+│   └── CompareContext.tsx    # Global compare state (max 3 cars)
+└── lib/
+    ├── types.ts              # TypeScript interfaces
+    ├── data.ts               # Car catalogue (10 new + 3 used)
+    ├── ai-engine.ts          # AI recommendation engine
+    ├── loan-engine.ts        # 7-lender loan comparison engine
+    └── insurance-engine.ts   # 6-insurer insurance engine
+```
 
-## Learn More
+## Build
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm run build
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Produces 7 static/SSR routes with 0 TypeScript or lint errors.

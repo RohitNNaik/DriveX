@@ -19,6 +19,7 @@ export async function GET(req: NextRequest) {
       brand: searchParams.get("brand") ?? undefined,
       minPrice: searchParams.has("minPrice") ? Number(searchParams.get("minPrice")) : undefined,
       maxPrice: searchParams.has("maxPrice") ? Number(searchParams.get("maxPrice")) : undefined,
+      cityUsage: searchParams.get("cityUsage") === "true",
       limit: searchParams.has("limit") ? Number(searchParams.get("limit")) : 50,
       skip: searchParams.has("skip") ? Number(searchParams.get("skip")) : 0,
     };

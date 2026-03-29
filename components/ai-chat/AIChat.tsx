@@ -5,12 +5,12 @@ import { Send, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import CarCard from "@/components/car-card/CarCard";
-import { getAIRecommendation } from "@/lib/ai-engine";
+import type { Car } from "@/lib/types";
 
 interface Message {
   role: "user" | "ai";
   text: string;
-  suggestions?: ReturnType<typeof getAIRecommendation>["suggestions"];
+  suggestions?: Car[];
 }
 
 const SUGGESTIONS = [
@@ -37,22 +37,37 @@ export default function AIChat() {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const handleSend = (query?: string) => {
+  const handleSend = async (query?: string) => {
     const text = query ?? input.trim();
-    if (!text) return;
+    if (!text || loading) return;
 
     setMessages((prev) => [...prev, { role: "user", text }]);
     setInput("");
     setLoading(true);
 
-    setTimeout(() => {
-      const response = getAIRecommendation(text);
+    try {
+      const res = await fetch("/api/bff/advisor", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query: text }),
+      });
+      const json = await res.json();
+      if (json.success) {
+        setMessages((prev) => [
+          ...prev,
+          { role: "ai", text: json.data.text, suggestions: json.data.suggestions },
+        ]);
+      } else {
+        throw new Error(json.error);
+      }
+    } catch {
       setMessages((prev) => [
         ...prev,
-        { role: "ai", text: response.text, suggestions: response.suggestions },
+        { role: "ai", text: "Sorry, I couldn't process that. Please try again." },
       ]);
+    } finally {
       setLoading(false);
-    }, 600);
+    }
   };
 
   return (

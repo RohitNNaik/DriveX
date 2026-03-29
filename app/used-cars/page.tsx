@@ -1,7 +1,21 @@
 import { USED_CARS } from "@/lib/data";
 import CarCard from "@/components/car-card/CarCard";
+import type { Car } from "@/lib/types";
 
-export default function UsedCarsPage() {
+async function fetchUsedCars(): Promise<Car[]> {
+  try {
+    const { getUsedCars } = await import("@/modules/usedCars/usedCar.service");
+    const cars = await getUsedCars();
+    if (cars.length > 0) return cars as unknown as Car[];
+  } catch {
+    // MongoDB not available — fall back to static data
+  }
+  return USED_CARS;
+}
+
+export default async function UsedCarsPage() {
+  const cars = await fetchUsedCars();
+
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 py-8">
       <div className="mb-6">
@@ -21,12 +35,12 @@ export default function UsedCarsPage() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-        {USED_CARS.map((car) => (
-          <CarCard key={car.id} car={car} />
+        {cars.map((car) => (
+          <CarCard key={(car as Car & { _id?: string })._id ?? car.id} car={car} />
         ))}
       </div>
 
-      {USED_CARS.length === 0 && (
+      {cars.length === 0 && (
         <div className="text-center text-gray-400 mt-16">
           <p className="text-lg">No used cars available right now.</p>
           <p className="text-sm mt-1">Check back soon!</p>

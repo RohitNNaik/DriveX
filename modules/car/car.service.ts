@@ -1,6 +1,6 @@
 import { connectDB } from "@/lib/db/mongoose";
 import { CarModel } from "./car.schema";
-import { CARS, USED_CARS } from "@/lib/data";
+import { CARS, USED_CARS, CAR_VARIANTS } from "@/lib/data";
 
 export interface CarFilters {
   isUsed?: boolean;
@@ -69,13 +69,42 @@ export async function getCarStats() {
 }
 
 /**
+ * Returns all variants for a given brand + model combination.
+ * Variants are identified by having a non-null `variant` field.
+ */
+export async function getVariantsByModel(brand: string, model: string) {
+  await connectDB();
+  return CarModel.find({
+    brand: new RegExp(`^${brand}$`, "i"),
+    model: new RegExp(`^${model}$`, "i"),
+    variant: { $exists: true, $ne: null },
+  })
+    .sort({ price: 1 })
+    .lean();
+}
+
+/**
+ * Returns a deduplicated list of models that have at least 2 variants.
+ */
+export async function getModelsWithVariants() {
+  await connectDB();
+  const results = await CarModel.aggregate([
+    { $match: { variant: { $exists: true, $ne: null } } },
+    { $group: { _id: { brand: "$brand", model: "$model" }, count: { $sum: 1 } } },
+    { $match: { count: { $gte: 2 } } },
+    { $sort: { "_id.brand": 1 } },
+  ]);
+  return results.map((r) => ({ brand: r._id.brand, model: r._id.model, variantCount: r.count }));
+}
+
+/**
  * Seeds the MongoDB collection from the static lib/data.ts catalogue.
  * Safe to call repeatedly — uses upsert to avoid duplicates.
  */
 export async function seedCars() {
   await connectDB();
 
-  const allCars = [...CARS, ...USED_CARS];
+  const allCars = [...CARS, ...USED_CARS, ...CAR_VARIANTS];
 
   const ops = allCars.map((car) => ({
     updateOne: {

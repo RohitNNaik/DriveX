@@ -9,7 +9,8 @@ DriveX is an intelligent car-buying assistant built with **Next.js 15**, **TypeS
 ## Features
 
 - **Browse & Filter** — Explore new and used cars with live filters (budget, fuel type, body type, city usage)
-- **Compare** — Select up to 3 cars and compare specs, pros & cons side-by-side; AI-generated winner & insights
+- **Compare (Different Cars)** — Select up to 3 cars and compare specs, pros & cons side-by-side; AI-generated winner & insights
+- **Compare (Same Model Variants)** — Pick a model (e.g., Hyundai Creta) and compare 2–4 trims side-by-side — winner highlight, price gap, best mileage variant, and per-cell green/winner indicators
 - **AI Car Advisor** — Chat-style advisor powered by OpenAI GPT-4o-mini (falls back to rule-based engine)
 - **Loan Calculator** — EMI calculator with 7-lender loan comparison (SBI, HDFC, ICICI, Axis, Kotak, Bajaj, Tata Capital)
 - **Insurance Recommender** — 6-insurer comparison (HDFC ERGO, Bajaj Allianz, ICICI Lombard, Go Digit, New India, Tata AIG)
@@ -63,7 +64,7 @@ Instead of generic endpoints like `GET /cars` + `GET /filters`, the BFF builds *
 | Method | Path | Description |
 |---|---|---|
 | GET | `/api/bff/explore-page-data` | Home page data — cars, stats, filter options |
-| POST | `/api/bff/compare` | `{ carIds[] }` → comparison table + winner + insights |
+| POST | `/api/bff/compare` | `{ mode?, carIds[] }` or `{ mode: "same-model-variants", variantIds[] }` → comparison table + winner + insights |
 | POST | `/api/bff/advisor` | `{ query, city?, budget? }` → AI car recommendations |
 
 ### Module APIs
@@ -71,6 +72,8 @@ Instead of generic endpoints like `GET /cars` + `GET /filters`, the BFF builds *
 | Method | Path | Description |
 |---|---|---|
 | GET | `/api/cars` | List new cars — filter by `fuelType`, `bodyType`, `brand`, `minPrice`, `maxPrice` |
+| GET | `/api/cars/variants` | `?brand=Hyundai&model=Creta` → list all trims for that model |
+| GET | `/api/cars/variant-models` | List all models that have ≥2 variants (for the variant picker) |
 | GET | `/api/cars/[id]` | Single car by MongoDB `_id` |
 | GET | `/api/used-cars` | List used cars — filter by `city`, `maxKmDriven`, `maxOwners` |
 | POST | `/api/leads` | Submit dealer lead `{ name, phone, city, carId?, intent? }` |
@@ -81,7 +84,14 @@ Instead of generic endpoints like `GET /cars` + `GET /filters`, the BFF builds *
 
 ### Example Responses
 
-**`POST /api/bff/compare`**
+**`POST /api/bff/compare` — compare different cars**
+```json
+{
+  "mode": "different-cars",
+  "carIds": ["<mongoId1>", "<mongoId2>"]
+}
+```
+Response:
 ```json
 {
   "winner": "Hyundai Creta",
@@ -94,6 +104,29 @@ Instead of generic endpoints like `GET /cars` + `GET /filters`, the BFF builds *
   "table": [
     { "label": "Price (₹)", "values": ["₹8,99,000", "₹11,00,000"], "winner": 0 },
     { "label": "Mileage (kmpl)", "values": ["19.8 kmpl", "17 kmpl"], "winner": 0 }
+  ]
+}
+```
+
+**`POST /api/bff/compare` — compare same model variants**
+```json
+{
+  "mode": "same-model-variants",
+  "variantIds": ["creta-e-petrol-mt", "creta-sx-diesel-at"]
+}
+```
+Response:
+```json
+{
+  "mode": "same-model-variants",
+  "winner": "Creta E Petrol MT",
+  "insights": [
+    "Creta E Petrol MT is the most affordable variant",
+    "Price gap across variants: ₹5,51,000"
+  ],
+  "table": [
+    { "label": "Price (₹)", "values": ["₹10,99,000", "₹16,50,000"], "winner": 0 },
+    { "label": "Mileage (kmpl)", "values": ["17.4 kmpl", "21.4 kmpl"], "winner": 1 }
   ]
 }
 ```
@@ -118,7 +151,7 @@ modules/
 │   └── car.service.ts      getCars(), getCarById(), getFeaturedCars(), seedCars()
 ├── comparison/
 │   ├── comparison.schema.ts
-│   └── comparison.service.ts  compareCarIds() → table + winner + insights
+│   └── comparison.service.ts  compareCarIds() + compareVariantIds() → table + winner + insights
 ├── ai/
 │   └── ai.service.ts       processAdvisorQuery() — OpenAI + rule-based fallback
 ├── leads/
@@ -131,12 +164,43 @@ modules/
 
 bff/
 ├── explore.api.ts          getExplorePageData()
-├── compare.api.ts          compareExperience()
+├── compare.api.ts          compareExperience() — mode: different-cars | same-model-variants
 └── advisor.api.ts          advisorExperience()
 
 lib/db/
 └── mongoose.ts             connectDB() with singleton caching
 ```
+
+---
+
+## Comparison Modes
+
+The `/compare` page supports two distinct modes toggled via a tab switcher:
+
+### Mode A — Compare Different Cars
+- Add up to 3 cars from the Browse page using the **+ Compare** button
+- Navigate to `/compare` to see the spec table, winner badge, and pros/cons cards
+- Hit **Refresh Analysis** to enhance the result with DB-sourced AI insights
+- Winner cells are highlighted green; the overall best-value car earns a 🏆 badge
+
+### Mode B — Compare Variants of the Same Model
+- Select this tab on `/compare` — no browsing required
+- **Step 1:** Choose a model (e.g., Hyundai Creta, Tata Nexon EV, Maruti Swift, Mahindra Scorpio N)
+  - Model list is fetched from `GET /api/cars/variant-models`
+- **Step 2:** Pick 2–4 variants using checkboxes
+  - Variant list is fetched from `GET /api/cars/variants?brand=Hyundai&model=Creta`
+- **Step 3:** Click **Compare N Variants** to trigger `POST /api/bff/compare` with `mode: "same-model-variants"`
+- Results include: winner with rationale, price gap insight, per-spec green winner cells, pros/cons per variant
+- Falls back to static `CAR_VARIANTS` data if MongoDB is unavailable
+
+### Variant Catalogue (static data in `lib/data.ts`)
+
+| Model | Variants |
+|---|---|
+| Hyundai Creta | E Petrol MT, S Petrol AT, SX Diesel AT, SX(O) Turbo Petrol DCT |
+| Tata Nexon EV | Medium Range 45kWh, Long Range 60kWh |
+| Maruti Swift | LXi Petrol MT, VXi Petrol MT, ZXi+ CNG, ZXi+ AT |
+| Mahindra Scorpio N | Z2 Petrol MT, Z8 Diesel AT 4WD |
 
 ---
 
@@ -218,13 +282,15 @@ drivex/
 ├── app/
 │   ├── page.tsx                    Home — hero + journey cards
 │   ├── cars/page.tsx               Browse with live filters
-│   ├── compare/page.tsx            Side-by-side comparison
+│   ├── compare/page.tsx            Side-by-side comparison (two modes: different cars & variants)
 │   ├── ai-advisor/page.tsx         AI chat advisor
 │   ├── used-cars/page.tsx          Used car listings
 │   ├── loan-calculator/page.tsx    4-tab loan & insurance centre
 │   └── api/                        Next.js API routes (BFF + modules)
 │       ├── bff/explore-page-data/
 │       ├── bff/compare/
+│       ├── cars/variants/
+│       ├── cars/variant-models/
 │       ├── bff/advisor/
 │       ├── cars/[id]/
 │       ├── used-cars/

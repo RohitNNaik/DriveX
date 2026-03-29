@@ -8,6 +8,8 @@ export interface Car {
   name: string;
   brand: string;
   model: string;
+  /** Human-readable variant label e.g. "S Petrol MT", "SX+ Diesel AT", "Long Range EV" */
+  variant?: string;
   year: number;
   price: number; // in INR
   image: string;
@@ -27,4 +29,22 @@ export interface Car {
   isUsed?: boolean;
   kmDriven?: number;
   owners?: number;
+}
+
+/** Lightweight card shown in variant pickers */
+export interface VariantSummary {
+  id: string;
+  brand: string;
+  model: string;
+  variant: string;
+  fuelType: FuelType;
+  transmission: TransmissionType;
+  price: number;
+}
+
+/** Groups all variants of a model for the variant picker */
+export interface ModelVariantGroup {
+  brand: string;
+  model: string;
+  variants: VariantSummary[];
 }

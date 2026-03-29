@@ -9,6 +9,8 @@ export type CarDocumentRaw = {
   brand: string;
   /** Car model name (e.g. "Brezza") — renamed to carModel in schema key to avoid conflicts */
   model: string;
+  /** Variant label e.g. "SX Diesel AT", "Long Range EV" */
+  variant?: string;
   year: number;
   price: number;
   image: string;
@@ -41,6 +43,7 @@ const CarSchema = new Schema<CarDocument>(
     name: { type: String, required: true },
     brand: { type: String, required: true, index: true },
     model: { type: String, required: true },
+    variant: { type: String },
     year: { type: Number, required: true },
     price: { type: Number, required: true, index: true },
     image: { type: String, default: "" },

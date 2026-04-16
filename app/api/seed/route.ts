@@ -1,22 +1,17 @@
 import { NextResponse } from "next/server";
-import { seedCars } from "@/modules/car/car.service";
+import { dotnet, DotnetApiError } from "@/lib/dotnet-client";
 
 /**
  * POST /api/seed
- * One-time seed route to populate MongoDB from static catalogue.
- * Safe to call multiple times (uses upsert).
+ * Proxies to .NET POST /api/seed.
+ * Safe to call multiple times — skips if data already exists.
  */
 export async function POST() {
   try {
-    const result = await seedCars();
-    return NextResponse.json({
-      success: true,
-      message: "Database seeded successfully",
-      upserted: result.upsertedCount,
-      matched: result.matchedCount,
-    });
+    const data = await dotnet.post<{ message: string }>("/api/seed");
+    return NextResponse.json({ success: true, message: data.message });
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Unknown error";
+    const message = err instanceof DotnetApiError ? err.message : "Seed failed";
     return NextResponse.json({ success: false, error: message }, { status: 500 });
   }
 }

@@ -1,12 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { advisorExperience } from "@/bff/advisor.api";
+import { dotnet, DotnetApiError } from "@/lib/dotnet-client";
 
 /**
  * POST /api/bff/advisor
- * Body: { query: string; city?: string; budget?: number }
+ * Proxies to .NET POST /api/bff/advisor.
  *
- * Returns AI-recommended cars with explanation text.
- * Uses OpenAI when OPENAI_API_KEY is set; falls back to rule-based engine.
+ * Body: { query: string; city?: string; budget?: number }
  */
 export async function POST(req: NextRequest) {
   try {
@@ -20,10 +19,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const data = await advisorExperience({ query, city, budget });
+    const data = await dotnet.post<unknown>("/api/bff/advisor", { query, city, budget });
     return NextResponse.json({ success: true, data });
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Unknown error";
-    return NextResponse.json({ success: false, error: message }, { status: 500 });
+    const message = err instanceof DotnetApiError ? err.message : "Advisor failed";
+    const status  = err instanceof DotnetApiError ? err.status  : 500;
+    return NextResponse.json({ success: false, error: message }, { status });
   }
 }

@@ -39,3 +39,11 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+/DriveX.API/.vs/
+/DriveX.API/DriveX.API/bin/Debug/net8.0
+/DriveX.API/DriveX.API/obj
+/DriveX.API/DriveX.Core/bin/Debug/net8.0
+/DriveX.API/DriveX.Core/obj
+/DriveX.API/DriveX.Infrastructure/bin/Debug/net8.0
+/DriveX.API/DriveX.Infrastructure/obj
+/.claude

@@ -8,11 +8,12 @@ import { useCompare } from "@/context/CompareContext";
 import { useCity, CITIES } from "@/context/CityContext";
 import { useGarage } from "@/context/GarageContext";
 import { cn } from "@/lib/utils";
+import { Tooltip } from "@/components/ui/tooltip";
 
 const LINKS = [
   { href: "/cars",            label: "Browse Cars",  icon: "🚗" },
   { href: "/compare",         label: "Compare",      icon: "⚖️" },
-  { href: "/shortlister",     label: "Shortlister",  icon: "🎯" },
+  { href: "/shortlister",     label: "My Car Pick",  icon: "🎯" },
   { href: "/used-cars",       label: "Used Cars",    icon: "🏷️" },
   { href: "/offers",          label: "Offers",       icon: "🔥", hot: true },
   { href: "/upcoming-cars",   label: "Upcoming",     icon: "🚀" },
@@ -127,18 +128,42 @@ export default function Navbar() {
           </div>
 
           {/* Garage icon */}
-          <Link
-            href="/garage"
-            className="relative flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white/80 text-slate-600 hover:border-rose-300 hover:text-rose-500 hover:bg-rose-50 transition-all"
-            title="My Garage"
+          <Tooltip
+            content={
+              saved.length > 0 ? (
+                <div className="text-left">
+                  <p className="font-bold mb-1.5">My Garage ({saved.length})</p>
+                  <div className="space-y-1 max-h-48 overflow-y-auto">
+                    {saved.slice(0, 5).map((car) => (
+                      <div key={car.id} className="text-[11px] text-gray-200">
+                        <p className="font-semibold">{car.brand} {car.model}</p>
+                        <p className="text-gray-300">{car.variant}</p>
+                      </div>
+                    ))}
+                    {saved.length > 5 && (
+                      <p className="text-[11px] text-gray-300 italic">+{saved.length - 5} more...</p>
+                    )}
+                  </div>
+                </div>
+              ) : (
+                "No cars in garage"
+              )
+            }
+            side="bottom"
           >
-            <Heart className={cn("h-4 w-4", saved.length > 0 && "fill-rose-500 text-rose-500")} />
-            {saved.length > 0 && (
-              <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-rose-500 text-[9px] font-black text-white">
-                {saved.length}
-              </span>
-            )}
-          </Link>
+            <Link
+              href="/garage"
+              className="relative flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white/80 text-slate-600 hover:border-rose-300 hover:text-rose-500 hover:bg-rose-50 transition-all cursor-pointer"
+              title="My Garage"
+            >
+              <Heart className={cn("h-4 w-4", saved.length > 0 && "fill-rose-500 text-rose-500")} />
+              {saved.length > 0 && (
+                <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-rose-500 text-[9px] font-black text-white">
+                  {saved.length}
+                </span>
+              )}
+            </Link>
+          </Tooltip>
 
           {/* Compare pill */}
           {selected.length > 0 && (

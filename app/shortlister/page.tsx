@@ -440,7 +440,7 @@ export default function ShortlisterPage() {
             <div>
               <div className="flex items-center gap-2 mb-3">
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-violet-500/20 border border-violet-500/30 px-3 py-1 text-xs font-bold text-violet-300">
-                  <Sparkles className="h-3 w-3" /> Smart Shortlister
+                  <Sparkles className="h-3 w-3" /> Smart My Car Pick
                 </span>
               </div>
               <h1 className="text-3xl sm:text-4xl font-black text-white">

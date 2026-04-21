@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { Check, X as XIcon, Trophy, Loader2, RefreshCw } from "lucide-react";
+import { Check, X as XIcon, Trophy, Loader2, RefreshCw, Sparkles, ArrowRight } from "lucide-react";
 import { useCompare } from "@/context/CompareContext";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { Car, VariantSummary } from "@/lib/types";
 import { CAR_VARIANTS } from "@/lib/data";
+import { slugifyModel } from "@/lib/variant-compare";
 
 // ─── helpers ────────────────────────────────────────────────────────────────
 
@@ -441,6 +442,32 @@ function VariantComparePicker() {
           </div>
         )}
       </div>
+
+      {/* Smart Insights CTA — shown as soon as a model is chosen */}
+      {selectedGroup && (
+        <Link
+          href={`/model/${slugifyModel(selectedGroup.brand, selectedGroup.model)}/compare`}
+          className="group flex items-center justify-between gap-4 rounded-2xl bg-gradient-to-r from-blue-600 to-violet-600 px-5 py-4 text-white shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 transition-all"
+        >
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white/20">
+              <Sparkles className="h-4 w-4 text-white" />
+            </div>
+            <div>
+              <p className="text-xs font-bold text-blue-200 uppercase tracking-wide">Phase 2 Smart Features</p>
+              <p className="text-sm font-black">
+                Deep Compare: {selectedGroup.brand} {selectedGroup.model}
+              </p>
+              <p className="text-xs text-blue-200 mt-0.5">
+                Radar chart · Decision Score · 5-yr Cost · Break-even · Trim Advisor
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-1 text-sm font-bold shrink-0 group-hover:gap-2 transition-all">
+            Open <ArrowRight className="h-4 w-4" />
+          </div>
+        </Link>
+      )}
 
       {/* Step 2 – variant picker */}
       {selectedGroup && (

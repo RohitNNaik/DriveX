@@ -16,6 +16,11 @@ import {
   Smartphone,
   Sparkles,
   X,
+  Dna,
+  Target,
+  Calculator,
+  Fuel,
+  TrendingUp,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -31,6 +36,11 @@ import {
   slugifyModel,
   variantHasFeature,
 } from "@/lib/variant-compare";
+import VariantDNAChart       from "@/components/variant-dna-chart/VariantDNAChart";
+import VariantDecisionScore  from "@/components/variant-decision-score/VariantDecisionScore";
+import CostOfOwnership       from "@/components/cost-of-ownership/CostOfOwnership";
+import FuelBreakEven         from "@/components/fuel-break-even/FuelBreakEven";
+import TrimUpgradeAdvisor    from "@/components/trim-upgrade-advisor/TrimUpgradeAdvisor";
 
 type ModelGroup = {
   brand: string;
@@ -251,6 +261,7 @@ export default function VariantCompareClient({ slug }: { slug: string }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [copied, setCopied] = useState(false);
+  const [insightTab, setInsightTab] = useState<"dna" | "score" | "cost" | "fuel" | "trim">("dna");
 
   useEffect(() => {
     let active = true;
@@ -560,6 +571,59 @@ export default function VariantCompareClient({ slug }: { slug: string }) {
           </div>
         ))}
       </div>
+
+      {/* ── Phase 2 Smart Insights ───────────────────────────────── */}
+      {selectedVariants.length >= 2 && (
+        <div className="mt-10">
+          {/* Section heading */}
+          <div className="mb-4">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-gradient-to-br from-blue-600 to-violet-600">
+                <Sparkles className="h-3.5 w-3.5 text-white" />
+              </span>
+              <h2 className="text-xl font-black text-slate-900">Smart Insights</h2>
+            </div>
+            <p className="text-sm text-slate-500 ml-8">
+              Five tools that make your variant decision bulletproof
+            </p>
+          </div>
+
+          {/* Tab bar */}
+          <div className="flex gap-2 flex-wrap mb-5">
+            {([
+              { id: "dna",   label: "Variant DNA",       icon: Dna        },
+              { id: "score", label: "Decision Score",    icon: Target     },
+              { id: "cost",  label: "Cost of Ownership", icon: Calculator },
+              { id: "fuel",  label: "Fuel Break-Even",   icon: Fuel       },
+              { id: "trim",  label: "Trim Advisor",      icon: TrendingUp },
+            ] as const).map((tab) => {
+              const Icon = tab.icon;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setInsightTab(tab.id)}
+                  className={cn(
+                    "flex items-center gap-2 rounded-xl border px-4 py-2 text-sm font-semibold transition-all",
+                    insightTab === tab.id
+                      ? "border-blue-500 bg-blue-500 text-white shadow-md shadow-blue-500/30"
+                      : "border-slate-200 bg-white text-slate-600 hover:border-blue-300 hover:text-blue-600"
+                  )}
+                >
+                  <Icon className="h-3.5 w-3.5" />
+                  {tab.label}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Tab panels */}
+          {insightTab === "dna"   && <VariantDNAChart      variants={selectedVariants} />}
+          {insightTab === "score" && <VariantDecisionScore  variants={selectedVariants} />}
+          {insightTab === "cost"  && <CostOfOwnership       variants={selectedVariants} />}
+          {insightTab === "fuel"  && <FuelBreakEven         variants={selectedVariants} />}
+          {insightTab === "trim"  && <TrimUpgradeAdvisor    variants={selectedVariants} />}
+        </div>
+      )}
 
       <div className="mt-8 overflow-x-auto rounded-3xl border bg-white shadow-sm">
         <table className="w-full min-w-[860px] border-separate border-spacing-0">

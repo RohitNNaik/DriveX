@@ -454,7 +454,7 @@ function VariantComparePicker() {
               <Sparkles className="h-4 w-4 text-white" />
             </div>
             <div>
-              <p className="text-xs font-bold text-blue-200 uppercase tracking-wide">Phase 2 Smart Features</p>
+              <p className="text-xs font-bold text-blue-200 uppercase tracking-wide">Smart Features</p>
               <p className="text-sm font-black">
                 Deep Compare: {selectedGroup.brand} {selectedGroup.model}
               </p>

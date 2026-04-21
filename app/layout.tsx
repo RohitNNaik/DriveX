@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { CompareProvider } from "@/context/CompareContext";
+import { CityProvider } from "@/context/CityContext";
 import Navbar from "@/components/navbar/Navbar";
 import CompareBar from "@/components/compare-bar/CompareBar";
 
@@ -21,11 +22,13 @@ export default function RootLayout({
       style={{ fontFamily: "system-ui, -apple-system, sans-serif" }}
     >
       <body className="min-h-full flex flex-col bg-gray-50">
-        <CompareProvider>
-          <Navbar />
-          <main className="flex-1 pb-24">{children}</main>
-          <CompareBar />
-        </CompareProvider>
+        <CityProvider>
+          <CompareProvider>
+            <Navbar />
+            <main className="flex-1 pb-24">{children}</main>
+            <CompareBar />
+          </CompareProvider>
+        </CityProvider>
       </body>
     </html>
   );

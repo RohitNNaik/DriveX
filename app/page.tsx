@@ -275,6 +275,122 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ── Offers This Month ─────────────────────────────────────── */}
+      <section className="mx-auto w-full max-w-7xl px-4 sm:px-6 py-14">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <span className="flex h-2 w-2 rounded-full bg-orange-500 animate-pulse" />
+              <span className="text-xs font-bold text-orange-600 uppercase tracking-wide">Live Deals</span>
+            </div>
+            <h2 className="text-2xl font-black text-slate-900">Best offers this month</h2>
+            <p className="text-sm text-slate-500 mt-0.5">Verified discounts — updated April 2026</p>
+          </div>
+          <Link href="/offers" className="hidden sm:flex items-center gap-1 text-sm font-semibold text-blue-600 hover:text-blue-700">
+            All offers <ChevronRight className="h-4 w-4" />
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {[
+            { brand: "Maruti Suzuki", model: "Swift",     emoji: "🔵", total: "₹65,000",  badge: "🔥 Bestseller", badgeColor: "bg-orange-500", highlight: true,  href: "/cars/maruti-swift-2024" },
+            { brand: "Hyundai",       model: "Creta",     emoji: "🔷", total: "₹1,02,000", badge: "🏆 Top Pick",  badgeColor: "bg-yellow-500", highlight: false, href: "/cars/hyundai-creta-2024" },
+            { brand: "Tata",          model: "Nexon EV",  emoji: "🟠", total: "₹2,25,000", badge: "⚡ EV Special", badgeColor: "bg-violet-500", highlight: false, href: "/cars/tata-nexon-ev-2024" },
+          ].map((o) => (
+            <Link
+              key={o.model}
+              href={o.href}
+              className={`group flex items-center justify-between rounded-2xl bg-white border px-5 py-4 hover:shadow-lg transition-all ${o.highlight ? "border-orange-300 shadow-orange-500/10 shadow-md" : "border-slate-200"}`}
+            >
+              <div className="flex items-center gap-3">
+                <span className="text-2xl">{o.emoji}</span>
+                <div>
+                  <p className="text-xs text-slate-500">{o.brand}</p>
+                  <p className="font-black text-slate-900">{o.model}</p>
+                  <p className="text-xs text-slate-400 mt-0.5">Save up to</p>
+                  <p className="text-lg font-black text-green-600">{o.total}</p>
+                </div>
+              </div>
+              <div className="flex flex-col items-end gap-2">
+                <span className={`rounded-full ${o.badgeColor} px-2.5 py-1 text-[10px] font-black text-white`}>{o.badge}</span>
+                <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-blue-600 transition-colors" />
+              </div>
+            </Link>
+          ))}
+        </div>
+
+        <div className="mt-4 text-center sm:hidden">
+          <Link href="/offers" className="text-sm font-semibold text-blue-600 hover:text-blue-700">
+            See all offers →
+          </Link>
+        </div>
+      </section>
+
+      {/* ── Upcoming Launches ─────────────────────────────────────── */}
+      <section className="bg-gradient-to-br from-slate-900 to-blue-950 py-14">
+        <div className="mx-auto w-full max-w-7xl px-4 sm:px-6">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <Clock className="h-3.5 w-3.5 text-blue-400" />
+                <span className="text-xs font-bold text-blue-400 uppercase tracking-wide">2026 Calendar</span>
+              </div>
+              <h2 className="text-2xl font-black text-white">Upcoming launches</h2>
+              <p className="text-sm text-slate-400 mt-0.5">5 cars launching soon · 4 EVs in pipeline</p>
+            </div>
+            <Link href="/upcoming-cars" className="hidden sm:flex items-center gap-1 text-sm font-semibold text-blue-400 hover:text-blue-300">
+              View all <ChevronRight className="h-4 w-4" />
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {[
+              { name: "Mahindra BE 6e",     brand: "Mahindra",      emoji: "⚡", gradient: "from-purple-600 to-violet-800", date: "May 2026",  status: "Confirmed",      statusColor: "bg-emerald-500", price: "₹19L – ₹26L", isEV: true },
+              { name: "Tata Sierra EV",     brand: "Tata",           emoji: "🔮", gradient: "from-blue-600 to-cyan-700",    date: "June 2026", status: "Confirmed",      statusColor: "bg-emerald-500", price: "₹25L – ₹32L", isEV: true },
+              { name: "Maruti e Vitara",    brand: "Maruti Suzuki",  emoji: "🌱", gradient: "from-green-500 to-teal-700",   date: "July 2026", status: "Expected",       statusColor: "bg-amber-500",   price: "₹15L – ₹20L", isEV: true },
+              { name: "Honda Amaze 2025",   brand: "Honda",          emoji: "⚪", gradient: "from-slate-500 to-slate-700",  date: "May 2026",  status: "Launching Soon", statusColor: "bg-orange-500",  price: "₹8L – ₹11L",  isEV: false },
+            ].map((car) => (
+              <div
+                key={car.name}
+                className="group rounded-2xl overflow-hidden bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all"
+              >
+                <div className={`relative h-24 bg-gradient-to-br ${car.gradient} flex items-center justify-center overflow-hidden`}>
+                  <div className="absolute -top-3 -right-3 h-14 w-14 rounded-full bg-white/10" />
+                  <span className="text-4xl relative z-10">{car.emoji}</span>
+                  <span className={`absolute top-2 left-2 rounded-full ${car.statusColor} px-2 py-0.5 text-[10px] font-black text-white`}>
+                    {car.status}
+                  </span>
+                  {car.isEV && (
+                    <span className="absolute top-2 right-2 rounded-full bg-violet-500 px-2 py-0.5 text-[10px] font-black text-white flex items-center gap-0.5">
+                      <Zap className="h-2.5 w-2.5" /> EV
+                    </span>
+                  )}
+                </div>
+                <div className="px-4 py-3">
+                  <p className="text-[11px] text-slate-400">{car.brand}</p>
+                  <p className="font-black text-white text-sm leading-tight">{car.name}</p>
+                  <div className="flex items-center justify-between mt-2">
+                    <span className="text-xs font-bold text-blue-300">{car.price}</span>
+                    <span className="flex items-center gap-1 text-[10px] text-slate-400">
+                      <Clock className="h-3 w-3" /> {car.date}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-6 text-center">
+            <Link
+              href="/upcoming-cars"
+              className="inline-flex items-center gap-2 rounded-2xl border border-white/20 bg-white/10 px-6 py-3 text-sm font-bold text-white hover:bg-white/20 transition-all sm:hidden"
+            >
+              See all upcoming cars <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* ── Why DriveX ────────────────────────────────────────────── */}
       <section className="mx-auto w-full max-w-7xl px-4 sm:px-6 py-16">
         <div className="text-center mb-10">

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CARS, CAR_VARIANTS } from "@/lib/data";
 import { Car } from "@/lib/types";
+import OnRoadPrice from "@/components/onroad-price/OnRoadPrice";
 import {
   ArrowLeft,
   Star,
@@ -294,38 +295,8 @@ export default async function CarDetailPage({
               </Link>
             )}
 
-            {/* Quick price summary */}
-            <div className="rounded-3xl bg-white border border-slate-200 shadow-sm p-5">
-              <h3 className="text-sm font-black text-slate-700 mb-3">Price Summary</h3>
-              <div className="space-y-2">
-                {[
-                  { label: "Ex-showroom",    value: car.price },
-                  { label: "Registration (~11%)", value: Math.round(car.price * 0.11) },
-                  { label: "Insurance (1st yr)",  value: Math.round(car.price * 0.035) },
-                  { label: "Other charges",       value: 15000 },
-                ].map((row, i, arr) => {
-                  const isLast = i === arr.length - 1;
-                  const total = arr.reduce((s, r) => s + r.value, 0);
-                  return (
-                    <div key={row.label} className={`flex justify-between text-sm ${isLast ? "pt-2 border-t border-slate-200 font-black text-slate-900" : "text-slate-600"}`}>
-                      <span>{row.label}</span>
-                      <span className={isLast ? "text-blue-700" : ""}>{formatPrice(row.value)}</span>
-                    </div>
-                  );
-                })}
-                <div className="flex justify-between text-sm pt-2 border-t border-slate-200 font-black text-slate-900">
-                  <span>On-road (est.)</span>
-                  <span className="text-blue-700">
-                    {formatPrice(
-                      car.price +
-                      Math.round(car.price * 0.11) +
-                      Math.round(car.price * 0.035) +
-                      15000
-                    )}
-                  </span>
-                </div>
-              </div>
-            </div>
+            {/* On-road price breakdown */}
+            <OnRoadPrice price={car.price} />
           </div>
         </div>
       </div>

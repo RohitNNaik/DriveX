@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { Plus, Minus, Star, Fuel, Zap, GitCompare, Eye, Gauge } from "lucide-react";
+import { Minus, Star, Fuel, Zap, GitCompare, Eye, Gauge, Heart } from "lucide-react";
 import { Car } from "@/lib/types";
 import { useCompare } from "@/context/CompareContext";
+import { useGarage } from "@/context/GarageContext";
 import { cn } from "@/lib/utils";
 
 function formatPrice(price: number) {
@@ -40,7 +41,9 @@ const TAG_COLORS: Record<string, string> = {
 
 export default function CarCard({ car }: { car: Car }) {
   const { addCar, removeCar, isSelected, isFull } = useCompare();
+  const { addToGarage, removeFromGarage, isInGarage } = useGarage();
   const selected  = isSelected(car.id);
+  const saved     = isInGarage(car.id);
   const gradient  = BODY_GRADIENTS[car.bodyType]  ?? "from-slate-500 to-slate-700";
   const shadowCls = SHADOW_COLORS[car.bodyType]   ?? "hover:shadow-slate-500/20";
 
@@ -86,10 +89,24 @@ export default function CarCard({ car }: { car: Car }) {
           )}
         </div>
 
-        {/* Rating */}
-        <div className="absolute top-3 right-3 flex items-center gap-1 rounded-full bg-white/95 backdrop-blur-sm px-2 py-1 shadow-lg">
-          <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-          <span className="text-xs font-black text-slate-800">{car.rating}</span>
+        {/* Rating + Heart */}
+        <div className="absolute top-3 right-3 flex items-center gap-1.5">
+          <button
+            onClick={(e) => { e.preventDefault(); saved ? removeFromGarage(car.id) : addToGarage(car); }}
+            className={cn(
+              "flex h-7 w-7 items-center justify-center rounded-full shadow-md transition-all duration-200",
+              saved
+                ? "bg-rose-500 text-white scale-110"
+                : "bg-white/95 text-slate-400 hover:text-rose-500 hover:scale-110"
+            )}
+            title={saved ? "Remove from garage" : "Save to garage"}
+          >
+            <Heart className={cn("h-3.5 w-3.5", saved && "fill-white")} />
+          </button>
+          <div className="flex items-center gap-1 rounded-full bg-white/95 backdrop-blur-sm px-2 py-1 shadow-lg">
+            <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+            <span className="text-xs font-black text-slate-800">{car.rating}</span>
+          </div>
         </div>
 
         {/* Body type pill */}

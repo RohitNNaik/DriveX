@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { CompareProvider } from "@/context/CompareContext";
 import { CityProvider } from "@/context/CityContext";
+import { GarageProvider } from "@/context/GarageContext";
 import Navbar from "@/components/navbar/Navbar";
 import CompareBar from "@/components/compare-bar/CompareBar";
 
@@ -23,11 +24,13 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col bg-gray-50">
         <CityProvider>
-          <CompareProvider>
-            <Navbar />
-            <main className="flex-1 pb-24">{children}</main>
-            <CompareBar />
-          </CompareProvider>
+          <GarageProvider>
+            <CompareProvider>
+              <Navbar />
+              <main className="flex-1 pb-24">{children}</main>
+              <CompareBar />
+            </CompareProvider>
+          </GarageProvider>
         </CityProvider>
       </body>
     </html>

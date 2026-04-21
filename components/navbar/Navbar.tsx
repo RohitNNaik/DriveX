@@ -3,14 +3,16 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { Menu, X, Zap, MapPin, ChevronDown, Check, Sparkles } from "lucide-react";
+import { Menu, X, Zap, MapPin, ChevronDown, Check, Sparkles, Heart } from "lucide-react";
 import { useCompare } from "@/context/CompareContext";
 import { useCity, CITIES } from "@/context/CityContext";
+import { useGarage } from "@/context/GarageContext";
 import { cn } from "@/lib/utils";
 
 const LINKS = [
   { href: "/cars",            label: "Browse Cars",  icon: "🚗" },
   { href: "/compare",         label: "Compare",      icon: "⚖️" },
+  { href: "/shortlister",     label: "Shortlister",  icon: "🎯" },
   { href: "/used-cars",       label: "Used Cars",    icon: "🏷️" },
   { href: "/offers",          label: "Offers",       icon: "🔥", hot: true },
   { href: "/upcoming-cars",   label: "Upcoming",     icon: "🚀" },
@@ -21,6 +23,7 @@ export default function Navbar() {
   const pathname = usePathname();
   const { selected } = useCompare();
   const { city, setCity } = useCity();
+  const { saved } = useGarage();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [cityOpen,   setCityOpen]   = useState(false);
 
@@ -122,6 +125,20 @@ export default function Navbar() {
               </>
             )}
           </div>
+
+          {/* Garage icon */}
+          <Link
+            href="/garage"
+            className="relative flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white/80 text-slate-600 hover:border-rose-300 hover:text-rose-500 hover:bg-rose-50 transition-all"
+            title="My Garage"
+          >
+            <Heart className={cn("h-4 w-4", saved.length > 0 && "fill-rose-500 text-rose-500")} />
+            {saved.length > 0 && (
+              <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-rose-500 text-[9px] font-black text-white">
+                {saved.length}
+              </span>
+            )}
+          </Link>
 
           {/* Compare pill */}
           {selected.length > 0 && (

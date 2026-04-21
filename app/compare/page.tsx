@@ -1,9 +1,11 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Check, X as XIcon, Trophy, Loader2, RefreshCw, Sparkles, ArrowRight } from "lucide-react";
 import { useCompare } from "@/context/CompareContext";
+import ShareCompareButton from "@/components/share-compare/ShareCompareButton";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
@@ -652,11 +654,12 @@ function DifferentCarsCompare() {
 
   return (
     <div className="space-y-5">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-3">
         <p className="text-sm text-gray-500">
           {selected.length} car{selected.length > 1 ? "s" : ""} selected (max 3)
         </p>
-        <div className="flex gap-3 items-center">
+        <div className="flex gap-2 items-center flex-wrap">
+          {selected.length >= 2 && <ShareCompareButton cars={selected} />}
           <Button
             size="sm"
             variant="outline"
@@ -723,7 +726,30 @@ function DifferentCarsCompare() {
 
 export default function ComparePage() {
   const [mode, setMode] = useState<CompareMode>("different-cars");
-  const { selected } = useCompare();
+  const { selected, addCar } = useCompare();
+  const searchParams = useSearchParams();
+
+  // Hydrate compare list from shared URL (?cars=id1,id2,id3)
+  useEffect(() => {
+    const param = searchParams.get("cars");
+    if (!param || selected.length > 0) return;
+    const ids = param.split(",").map((s) => s.trim()).filter(Boolean).slice(0, 3);
+    if (ids.length < 2) return;
+    async function hydrate() {
+      for (const id of ids) {
+        try {
+          const res = await fetch(`/api/cars/${id}`);
+          const json = await res.json();
+          if (json.success && json.data) { addCar(json.data); continue; }
+        } catch {}
+        const { CARS, CAR_VARIANTS } = await import("@/lib/data");
+        const found = [...CARS, ...CAR_VARIANTS].find((c) => c.id === id);
+        if (found) addCar(found);
+      }
+    }
+    hydrate();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const tabs: { id: CompareMode; label: string; badge?: string }[] = [
     {

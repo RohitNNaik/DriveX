@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import { CARS, CAR_VARIANTS } from "@/lib/data";
 import { Car } from "@/lib/types";
 import OnRoadPrice from "@/components/onroad-price/OnRoadPrice";
+import BuySignal from "@/components/buy-signal/BuySignal";
+import GarageButton from "./GarageButton";
 import {
   ArrowLeft,
   Star,
@@ -240,6 +242,7 @@ export default async function CarDetailPage({
             <div className="rounded-3xl bg-white border border-slate-200 shadow-sm p-5 flex flex-col gap-3">
               <h3 className="text-sm font-black text-slate-700 uppercase tracking-wide">Actions</h3>
 
+              <GarageButton car={car} />
               <AddToCompareButton car={car} />
 
               <Link
@@ -294,6 +297,9 @@ export default async function CarDetailPage({
                 </div>
               </Link>
             )}
+
+            {/* Should I Buy Now signal */}
+            <BuySignal car={car} />
 
             {/* On-road price breakdown */}
             <OnRoadPrice price={car.price} />

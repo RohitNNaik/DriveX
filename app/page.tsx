@@ -35,7 +35,7 @@ const JOURNEYS = [
     desc: "Filter by budget, fuel type, body style & city usage. Results update instantly.",
     href: "/cars",
     cta: "Browse Cars",
-    accentColor: "border-l-blue-500",
+    hoverBar: "from-blue-400",
   },
   {
     icon: GitCompare,
@@ -45,7 +45,7 @@ const JOURNEYS = [
     desc: "Stack up to 3 cars. Specs, pros, cons, and expert insights — all in one view.",
     href: "/compare",
     cta: "Compare Now",
-    accentColor: "border-l-emerald-500",
+    hoverBar: "from-emerald-400",
   },
   {
     icon: Sparkles,
@@ -55,7 +55,7 @@ const JOURNEYS = [
     desc: `"Best SUV under 10L for Bangalore traffic" — just type it. AI does the rest.`,
     href: "/ai-advisor",
     cta: "Ask AI",
-    accentColor: "border-l-violet-500",
+    hoverBar: "from-violet-400",
   },
   {
     icon: Calculator,
@@ -65,7 +65,7 @@ const JOURNEYS = [
     desc: "Compare 7 lenders, calculate EMI, get insurance quotes and dealer deals.",
     href: "/loan-calculator",
     cta: "Calculate EMI",
-    accentColor: "border-l-orange-500",
+    hoverBar: "from-orange-400",
   },
 ];
 
@@ -117,44 +117,50 @@ export default function HomePage() {
     <div className="flex flex-col bg-slate-50">
 
       {/* ── Hero ─────────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden bg-[#0f172a]">
-        {/* Background gradient layers */}
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-900/80 via-slate-900 to-slate-950" />
-        <div className="absolute top-0 right-0 h-[500px] w-[500px] rounded-full bg-blue-600/20 blur-[120px]" />
-        <div className="absolute bottom-0 left-0 h-[400px] w-[400px] rounded-full bg-violet-600/15 blur-[100px]" />
+      <section className="relative overflow-hidden bg-[#060d1f]">
+        {/* Animated gradient orbs */}
+        <div className="absolute top-0 right-0 h-[600px] w-[600px] rounded-full bg-blue-600/25 blur-[140px] animate-pulse-slow" />
+        <div className="absolute bottom-0 left-0 h-[500px] w-[500px] rounded-full bg-violet-600/20 blur-[120px] animate-pulse-slow" style={{ animationDelay: "1.5s" }} />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[300px] w-[600px] rounded-full bg-cyan-600/10 blur-[80px]" />
 
-        {/* Dotted grid overlay */}
+        {/* Grid overlay */}
         <div
-          className="absolute inset-0 opacity-[0.03]"
+          className="absolute inset-0 opacity-[0.04]"
           style={{
             backgroundImage: "radial-gradient(circle, white 1px, transparent 1px)",
-            backgroundSize: "32px 32px",
+            backgroundSize: "28px 28px",
           }}
         />
 
-        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 py-20 sm:py-28">
+        {/* Diagonal accent line */}
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-blue-500/60 to-transparent" />
+
+        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 py-22 sm:py-32">
           <div className="flex flex-col items-center text-center gap-7">
-            {/* Badge */}
-            <div className="inline-flex items-center gap-2 rounded-full border border-blue-500/30 bg-blue-500/10 px-4 py-1.5">
-              <span className="flex h-1.5 w-1.5 rounded-full bg-blue-400 animate-pulse" />
-              <span className="text-sm font-medium text-blue-300">India&apos;s smartest car decision platform</span>
+
+            {/* Floating badge */}
+            <div className="inline-flex items-center gap-2.5 rounded-full border border-blue-400/30 bg-gradient-to-r from-blue-500/15 to-violet-500/10 px-5 py-2 shadow-lg shadow-blue-500/10 animate-badge-pop">
+              <span className="flex h-2 w-2 rounded-full bg-blue-400 animate-pulse" />
+              <span className="text-sm font-semibold text-blue-300 tracking-wide">India&apos;s smartest car decision platform</span>
+              <span className="text-xs text-blue-400/60">✦</span>
             </div>
 
             {/* Headline */}
-            <h1 className="text-5xl sm:text-7xl font-black leading-[1.05] tracking-tight max-w-4xl text-white">
+            <h1 className="text-5xl sm:text-7xl font-black leading-[1.04] tracking-tight max-w-4xl text-white animate-slide-up">
               Find your{" "}
               <span className="relative inline-block">
-                <span className="relative z-10 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400">
+                <span className="relative z-10 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-cyan-300 to-blue-500 animate-gradient-shift">
                   perfect car
                 </span>
-                <span className="absolute -bottom-1 left-0 right-0 h-1 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-full opacity-60" />
+                <span className="absolute -bottom-1.5 left-0 right-0 h-1.5 bg-gradient-to-r from-blue-500 via-cyan-400 to-blue-500 rounded-full opacity-70 animate-gradient-shift" />
               </span>
               {" "}in minutes
             </h1>
 
-            <p className="text-lg sm:text-xl text-slate-400 max-w-2xl leading-relaxed">
-              AI recommendations. Instant compare. Real-time filters. Cut through the noise
-              and drive away with complete confidence.
+            <p className="text-lg sm:text-xl text-slate-400 max-w-2xl leading-relaxed animate-slide-up" style={{ animationDelay: "0.1s" }}>
+              AI recommendations · Instant compare · Variant deep-dive · Real on-road price.
+              <br className="hidden sm:block" />
+              Cut through the noise and drive away with complete confidence.
             </p>
 
             {/* Popular searches */}
@@ -164,7 +170,7 @@ export default function HomePage() {
                 <Link
                   key={s}
                   href="/cars"
-                  className="rounded-full border border-slate-700 bg-slate-800/50 px-3 py-1 text-xs text-slate-300 hover:border-blue-500 hover:text-blue-300 hover:bg-slate-800 transition-all"
+                  className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-slate-300 hover:border-blue-500/60 hover:text-blue-300 hover:bg-blue-500/10 transition-all duration-200 backdrop-blur-sm"
                 >
                   {s}
                 </Link>
@@ -175,25 +181,40 @@ export default function HomePage() {
             <div className="flex flex-col sm:flex-row gap-3 mt-2">
               <Link
                 href="/cars"
-                className="group flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-blue-500 to-blue-700 px-7 py-3.5 text-base font-bold text-white shadow-xl shadow-blue-500/30 hover:shadow-blue-500/50 hover:from-blue-600 hover:to-blue-800 transition-all"
+                className="group relative flex items-center justify-center gap-2 rounded-2xl px-8 py-3.5 text-base font-bold text-white overflow-hidden btn-glow-blue shine-on-hover"
+                style={{ background: "linear-gradient(135deg, #2563eb, #1d4ed8, #1e40af)" }}
               >
                 <Search className="h-4 w-4" />
                 Browse Cars
-                <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
+                <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform duration-200" />
               </Link>
               <Link
                 href="/ai-advisor"
-                className="flex items-center justify-center gap-2 rounded-2xl border border-slate-600 bg-slate-800/60 px-7 py-3.5 text-base font-bold text-white hover:border-violet-500 hover:bg-slate-800 transition-all"
+                className="relative flex items-center justify-center gap-2 rounded-2xl border border-white/15 bg-white/8 backdrop-blur-sm px-8 py-3.5 text-base font-bold text-white hover:border-violet-400/50 hover:bg-violet-500/15 transition-all duration-200 shine-on-hover"
               >
                 <Sparkles className="h-4 w-4 text-violet-400" />
                 Ask AI Advisor
               </Link>
             </div>
+
+            {/* Trust chips */}
+            <div className="flex flex-wrap justify-center gap-4 mt-2">
+              {[
+                { icon: "🔒", text: "No spam · No dealer pressure" },
+                { icon: "⚡", text: "AI-powered advice" },
+                { icon: "📊", text: "Real on-road prices" },
+              ].map((c) => (
+                <span key={c.text} className="flex items-center gap-1.5 text-xs text-slate-500">
+                  <span>{c.icon}</span>
+                  {c.text}
+                </span>
+              ))}
+            </div>
           </div>
         </div>
 
         {/* Bottom fade */}
-        <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-slate-50 to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-slate-50 to-transparent" />
       </section>
 
       {/* ── Body Type Quick Picks ─────────────────────────────────── */}
@@ -227,30 +248,44 @@ export default function HomePage() {
       {/* ── Journey Cards ─────────────────────────────────────────── */}
       <section className="mx-auto w-full max-w-7xl px-4 sm:px-6 py-4 pb-14">
         <div className="text-center mb-8">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-600 mb-3">
+            HOW IT WORKS
+          </span>
           <h2 className="text-2xl sm:text-3xl font-black text-slate-900">Your path to the right car</h2>
           <p className="text-slate-500 mt-1">Four powerful tools. One confident decision.</p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {JOURNEYS.map((j) => {
+          {JOURNEYS.map((j, i) => {
             const Icon = j.icon;
             return (
               <Link
                 key={j.href}
                 href={j.href}
-                className={`group relative flex flex-col gap-4 rounded-2xl border-l-4 ${j.accentColor} bg-white border border-l-4 border-slate-200 p-6 hover:shadow-xl hover:shadow-slate-200/80 transition-all card-lift`}
+                className={`group relative flex flex-col gap-4 rounded-2xl bg-white border border-slate-200 p-6 hover:shadow-xl transition-all duration-300 card-glow overflow-hidden`}
               >
-                <div className={`flex h-11 w-11 items-center justify-center rounded-xl ${j.iconBg}`}>
+                {/* Step number watermark */}
+                <span className="absolute top-3 right-4 text-6xl font-black text-slate-100 select-none group-hover:text-blue-50 transition-colors">
+                  {i + 1}
+                </span>
+
+                <div className={`relative flex h-12 w-12 items-center justify-center rounded-2xl ${j.iconBg} shadow-sm group-hover:scale-110 transition-transform duration-200`}>
                   <Icon className={`h-5 w-5 ${j.iconColor}`} />
+                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/40 to-transparent" />
                 </div>
-                <div className="flex-1">
-                  <h3 className="font-bold text-base text-slate-900 mb-1.5">{j.title}</h3>
+
+                <div className="flex-1 relative z-10">
+                  <h3 className="font-black text-base text-slate-900 mb-1.5 group-hover:text-blue-700 transition-colors">{j.title}</h3>
                   <p className="text-sm text-slate-500 leading-relaxed">{j.desc}</p>
                 </div>
-                <span className="flex items-center gap-1.5 text-sm font-bold text-slate-700 group-hover:text-blue-600 transition-colors">
+
+                <span className="relative z-10 flex items-center gap-1.5 text-sm font-bold text-slate-600 group-hover:text-blue-600 transition-colors">
                   {j.cta}
-                  <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-1 transition-transform" />
+                  <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-1.5 transition-transform duration-200" />
                 </span>
+
+                {/* Bottom accent line on hover */}
+                <div className={`absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r ${j.hoverBar} to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
               </Link>
             );
           })}
@@ -258,17 +293,22 @@ export default function HomePage() {
       </section>
 
       {/* ── Stats Banner ──────────────────────────────────────────── */}
-      <section className="bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 py-12 grid grid-cols-2 lg:grid-cols-4 gap-8">
+      <section className="relative overflow-hidden">
+        <div className="absolute inset-0 animate-gradient-shift" style={{ background: "linear-gradient(135deg, #1e40af, #2563eb, #4f46e5, #7c3aed, #2563eb)" }} />
+        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: "radial-gradient(circle, white 1px, transparent 1px)", backgroundSize: "24px 24px" }} />
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+
+        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 py-14 grid grid-cols-2 lg:grid-cols-4 gap-8">
           {STATS.map((s) => {
             const Icon = s.icon;
             return (
-              <div key={s.label} className="flex flex-col items-center gap-2 text-center">
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white/15 mb-1">
-                  <Icon className="h-6 w-6 text-white" />
+              <div key={s.label} className="flex flex-col items-center gap-2 text-center group">
+                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/15 backdrop-blur-sm mb-1 border border-white/20 group-hover:bg-white/25 group-hover:scale-110 transition-all duration-300 shadow-lg">
+                  <Icon className="h-7 w-7 text-white" />
                 </div>
-                <span className="text-4xl font-black text-white">{s.value}</span>
-                <span className="text-sm text-blue-100">{s.label}</span>
+                <span className="text-5xl font-black text-white drop-shadow-lg">{s.value}</span>
+                <span className="text-sm font-medium text-blue-100">{s.label}</span>
               </div>
             );
           })}
@@ -394,7 +434,7 @@ export default function HomePage() {
       {/* ── Why DriveX ────────────────────────────────────────────── */}
       <section className="mx-auto w-full max-w-7xl px-4 sm:px-6 py-16">
         <div className="text-center mb-10">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1 text-xs font-bold text-blue-700 mb-3">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-blue-50 to-violet-50 border border-blue-200/60 px-4 py-1 text-xs font-black text-blue-700 mb-3">
             <Star className="h-3 w-3 fill-blue-600" />
             WHY DRIVEX
           </span>
@@ -406,12 +446,15 @@ export default function HomePage() {
           {WHY_US.map((w) => {
             const Icon = w.icon;
             return (
-              <div key={w.title} className="flex flex-col gap-3 rounded-2xl bg-white border border-slate-200 p-6 hover:shadow-lg hover:shadow-slate-200/80 transition-shadow">
-                <div className={`flex h-11 w-11 items-center justify-center rounded-xl ${w.bg}`}>
+              <div key={w.title} className="group relative flex flex-col gap-3 rounded-2xl bg-white border border-slate-200 p-6 hover:shadow-xl hover:shadow-slate-200/80 hover:-translate-y-1 transition-all duration-300 overflow-hidden">
+                {/* Hover glow bg */}
+                <div className={`absolute inset-0 ${w.bg} opacity-0 group-hover:opacity-40 transition-opacity duration-300 rounded-2xl`} />
+
+                <div className={`relative flex h-12 w-12 items-center justify-center rounded-2xl ${w.bg} border border-current/10 shadow-sm group-hover:scale-110 transition-transform duration-200`}>
                   <Icon className={`h-5 w-5 ${w.iconColor}`} />
                 </div>
-                <h3 className="font-bold text-slate-900">{w.title}</h3>
-                <p className="text-sm text-slate-500 leading-relaxed">{w.desc}</p>
+                <h3 className="relative font-black text-slate-900 group-hover:text-slate-800">{w.title}</h3>
+                <p className="relative text-sm text-slate-500 leading-relaxed">{w.desc}</p>
               </div>
             );
           })}
@@ -419,29 +462,48 @@ export default function HomePage() {
       </section>
 
       {/* ── CTA Banner ────────────────────────────────────────────── */}
-      <section className="mx-4 sm:mx-6 mb-16 rounded-3xl bg-gradient-to-br from-slate-900 to-blue-950 overflow-hidden relative">
-        <div className="absolute top-0 right-0 h-64 w-64 rounded-full bg-blue-500/20 blur-[80px]" />
-        <div className="absolute bottom-0 left-0 h-48 w-48 rounded-full bg-violet-500/20 blur-[60px]" />
-        <div className="relative max-w-7xl mx-auto px-6 py-14 flex flex-col sm:flex-row items-center justify-between gap-8">
+      <section className="mx-4 sm:mx-6 mb-16 rounded-3xl overflow-hidden relative neon-top">
+        <div className="absolute inset-0 animate-gradient-shift" style={{ background: "linear-gradient(135deg, #0f172a, #1e1b4b, #0c1445, #1e0a3c, #0f172a)" }} />
+        <div className="absolute top-0 right-0 h-72 w-72 rounded-full bg-blue-500/25 blur-[80px]" />
+        <div className="absolute bottom-0 left-0 h-56 w-56 rounded-full bg-violet-500/25 blur-[60px]" />
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-blue-400/50 to-transparent" />
+
+        {/* Star dots */}
+        {[...Array(6)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute h-1 w-1 rounded-full bg-white/40"
+            style={{
+              top: `${[20, 60, 35, 75, 15, 55][i]}%`,
+              left: `${[10, 20, 50, 65, 80, 90][i]}%`,
+            }}
+          />
+        ))}
+
+        <div className="relative max-w-7xl mx-auto px-6 py-16 flex flex-col sm:flex-row items-center justify-between gap-8">
           <div className="text-center sm:text-left">
-            <h2 className="text-3xl font-black text-white leading-tight">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-violet-400/30 bg-violet-500/10 px-3 py-1 text-xs font-bold text-violet-300 mb-3">
+              <Sparkles className="h-3 w-3" /> AI-POWERED
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-black text-white leading-tight">
               Not sure where to start?
             </h2>
-            <p className="text-slate-400 mt-2 max-w-sm">
-              Tell our AI what you need. Budget, city, family size — it handles the rest.
+            <p className="text-slate-400 mt-2 max-w-sm leading-relaxed">
+              Tell our AI your budget, city, and family size — it finds the perfect match.
             </p>
           </div>
           <div className="flex flex-col sm:flex-row gap-3 shrink-0">
             <Link
               href="/ai-advisor"
-              className="flex items-center gap-2 rounded-2xl bg-gradient-to-r from-violet-500 to-blue-600 px-6 py-3 font-bold text-white shadow-xl shadow-blue-500/30 hover:shadow-blue-500/50 transition-all"
+              className="flex items-center gap-2 rounded-2xl px-7 py-3.5 font-bold text-white btn-glow-violet shine-on-hover"
+              style={{ background: "linear-gradient(135deg, #7c3aed, #6366f1, #8b5cf6)" }}
             >
               <Sparkles className="h-4 w-4" />
               Ask AI Advisor
             </Link>
             <Link
               href="/cars"
-              className="flex items-center gap-2 rounded-2xl border border-slate-600 px-6 py-3 font-bold text-white hover:border-slate-400 hover:bg-white/5 transition-all"
+              className="flex items-center gap-2 rounded-2xl border border-white/15 bg-white/8 backdrop-blur-sm px-7 py-3.5 font-bold text-white hover:border-white/30 hover:bg-white/15 transition-all"
             >
               Browse Cars
               <ArrowRight className="h-4 w-4" />

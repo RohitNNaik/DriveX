@@ -47,3 +47,6 @@ next-env.d.ts
 /DriveX.API/DriveX.Infrastructure/bin/Debug/net8.0
 /DriveX.API/DriveX.Infrastructure/obj
 /.claude
+/.vs
+/.vs
+/.vs/slnx.sqlite

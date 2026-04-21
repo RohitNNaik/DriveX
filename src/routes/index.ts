@@ -1,9 +1,9 @@
 import { Router } from "express";
+import scraperRoutes from "./scraper.routes";
 
 const router = Router();
 
-// Register route modules here as they are created, e.g.:
-// import carRoutes from "./car.routes";
-// router.use("/cars", carRoutes);
+// Register route modules
+router.use("/scraped-prices", scraperRoutes);
 
 export default router;

@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import routes from "./routes";
 
 const app = express();
 
@@ -9,5 +10,7 @@ app.use(express.json());
 app.get("/", (req, res) => {
   res.send("Drivex API running 🚗");
 });
+
+app.use("/api", routes);
 
 export default app;

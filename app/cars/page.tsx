@@ -5,6 +5,7 @@ import { CARS } from "@/lib/data";
 import CarCard from "@/components/car-card/CarCard";
 import Filters, { FilterState } from "@/components/filters/Filters";
 import { Car } from "@/lib/types";
+import { Search, SlidersHorizontal } from "lucide-react";
 
 const DEFAULT_FILTERS: FilterState = {
   maxBudget: 2500000,
@@ -13,7 +14,6 @@ const DEFAULT_FILTERS: FilterState = {
   cityUsage: false,
 };
 
-/** Client-side fallback filter for when the API is unavailable */
 function filterStatic(f: FilterState): Car[] {
   return CARS.filter((car) => {
     if (car.price > f.maxBudget) return false;
@@ -28,6 +28,7 @@ export default function CarsPage() {
   const [filters, setFilters] = useState<FilterState>(DEFAULT_FILTERS);
   const [cars, setCars] = useState<Car[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showFilters, setShowFilters] = useState(true);
 
   const fetchCars = useCallback(async (f: FilterState) => {
     setLoading(true);
@@ -47,50 +48,97 @@ export default function CarsPage() {
     }
   }, []);
 
-  // Debounce filter changes by 300ms to avoid hammering the API on slider drag
   useEffect(() => {
     const timer = setTimeout(() => fetchCars(filters), 300);
     return () => clearTimeout(timer);
   }, [filters, fetchCars]);
 
   return (
-    <div className="mx-auto max-w-7xl px-4 sm:px-6 py-8">
-      <div className="mb-6">
-        <h1 className="text-2xl sm:text-3xl font-bold mb-1">Browse Cars</h1>
-        <p className="text-gray-500 text-sm">Find your perfect car with fast filters</p>
+    <div className="min-h-screen bg-slate-50">
+      {/* Page Header */}
+      <div className="bg-white border-b border-slate-200">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 py-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-black text-slate-900">Browse Cars</h1>
+              <p className="text-slate-500 text-sm mt-0.5">
+                {loading ? (
+                  <span className="text-blue-600 animate-pulse">Finding cars…</span>
+                ) : (
+                  <>
+                    <span className="font-bold text-slate-800">{cars.length}</span>
+                    {" "}car{cars.length !== 1 ? "s" : ""} match your filters
+                  </>
+                )}
+              </p>
+            </div>
+            <button
+              onClick={() => setShowFilters((v) => !v)}
+              className="flex items-center gap-2 self-start sm:self-auto rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:border-blue-300 hover:text-blue-600 transition-all shadow-sm"
+            >
+              <SlidersHorizontal className="h-4 w-4" />
+              {showFilters ? "Hide Filters" : "Show Filters"}
+            </button>
+          </div>
+        </div>
       </div>
 
-      <Filters filters={filters} onChange={setFilters} />
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 py-6">
+        <div className="flex flex-col lg:flex-row gap-6">
 
-      <div className="mt-6 flex items-center justify-between">
-        <p className="text-sm text-gray-500">
-          {loading ? "Loading…" : `${cars.length} car${cars.length !== 1 ? "s" : ""} found`}
-        </p>
-        <button
-          onClick={() => setFilters(DEFAULT_FILTERS)}
-          className="text-xs text-blue-600 hover:underline"
-        >
-          Reset filters
-        </button>
+          {/* Sidebar Filters */}
+          {showFilters && (
+            <aside className="w-full lg:w-72 shrink-0">
+              <div className="sticky top-20">
+                <Filters filters={filters} onChange={setFilters} />
+              </div>
+            </aside>
+          )}
+
+          {/* Results */}
+          <div className="flex-1 min-w-0">
+            {loading ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <div key={i} className="rounded-2xl bg-white border border-slate-200 overflow-hidden">
+                    <div className="h-44 skeleton" />
+                    <div className="p-4 flex flex-col gap-3">
+                      <div className="h-4 w-3/4 skeleton rounded-full" />
+                      <div className="h-3 w-1/2 skeleton rounded-full" />
+                      <div className="h-6 w-1/3 skeleton rounded-full" />
+                      <div className="grid grid-cols-3 gap-2">
+                        {[1, 2, 3].map((j) => <div key={j} className="h-12 skeleton rounded-xl" />)}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : cars.length === 0 ? (
+              <div className="flex flex-col items-center justify-center gap-4 py-24 text-center">
+                <div className="flex h-20 w-20 items-center justify-center rounded-full bg-slate-100">
+                  <Search className="h-8 w-8 text-slate-400" />
+                </div>
+                <div>
+                  <p className="text-lg font-bold text-slate-700">No cars found</p>
+                  <p className="text-sm text-slate-500 mt-1">Try increasing your budget or changing filters.</p>
+                </div>
+                <button
+                  onClick={() => setFilters(DEFAULT_FILTERS)}
+                  className="rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-blue-700 transition-colors shadow-md shadow-blue-500/30"
+                >
+                  Reset Filters
+                </button>
+              </div>
+            ) : (
+              <div className={`grid gap-5 ${showFilters ? "grid-cols-1 sm:grid-cols-2 xl:grid-cols-3" : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"}`}>
+                {cars.map((car) => (
+                  <CarCard key={(car as Car & { _id?: string })._id ?? car.id} car={car} />
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
       </div>
-
-      {loading ? (
-        <div className="mt-16 text-center text-gray-400 animate-pulse">
-          <p className="text-lg">Loading cars…</p>
-        </div>
-      ) : cars.length === 0 ? (
-        <div className="mt-16 text-center text-gray-400">
-          <p className="text-lg">No cars match your filters.</p>
-          <p className="text-sm mt-1">Try increasing your budget or changing filters.</p>
-        </div>
-      ) : (
-        <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-          {cars.map((car) => (
-            <CarCard key={(car as Car & { _id?: string })._id ?? car.id} car={car} />
-          ))}
-        </div>
-      )}
     </div>
   );
 }
-

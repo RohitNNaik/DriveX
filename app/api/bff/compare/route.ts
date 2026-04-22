@@ -1,16 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { compareExperience } from "@/bff/compare.api";
+import { dotnet, DotnetApiError } from "@/lib/dotnet-client";
 
 /**
  * POST /api/bff/compare
+ * Proxies to .NET POST /api/bff/compare.
  *
- * Mode A — different cars:
- *   Body: { mode?: "different-cars", carIds: string[] }
- *
- * Mode B — same model variants:
- *   Body: { mode: "same-model-variants", variantIds: string[] }
- *
- * Returns normalized comparison table, winner, and insights.
+ * Body: { mode?, carIds? } | { mode: "same-model-variants", variantIds? }
  */
 export async function POST(req: NextRequest) {
   try {
@@ -24,21 +19,20 @@ export async function POST(req: NextRequest) {
           { status: 400 }
         );
       }
-      const data = await compareExperience({ mode: "same-model-variants", variantIds });
-      return NextResponse.json({ success: true, data });
+    } else {
+      if (!Array.isArray(carIds) || carIds.length < 2) {
+        return NextResponse.json(
+          { success: false, error: "Provide 2 or 3 car IDs in carIds[]" },
+          { status: 400 }
+        );
+      }
     }
 
-    // default: different-cars
-    if (!Array.isArray(carIds) || carIds.length < 2) {
-      return NextResponse.json(
-        { success: false, error: "Provide 2 or 3 car IDs in carIds[]" },
-        { status: 400 }
-      );
-    }
-    const data = await compareExperience({ mode: "different-cars", carIds });
+    const data = await dotnet.post<unknown>("/api/bff/compare", body);
     return NextResponse.json({ success: true, data });
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Unknown error";
-    return NextResponse.json({ success: false, error: message }, { status: 500 });
+    const message = err instanceof DotnetApiError ? err.message : "Comparison failed";
+    const status  = err instanceof DotnetApiError ? err.status  : 500;
+    return NextResponse.json({ success: false, error: message }, { status });
   }
 }

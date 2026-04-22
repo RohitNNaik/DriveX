@@ -1,15 +1,18 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Check, X as XIcon, Trophy, Loader2, RefreshCw } from "lucide-react";
+import { Check, X as XIcon, Trophy, Loader2, RefreshCw, Sparkles, ArrowRight } from "lucide-react";
 import { useCompare } from "@/context/CompareContext";
+import ShareCompareButton from "@/components/share-compare/ShareCompareButton";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { Car, VariantSummary } from "@/lib/types";
 import { CAR_VARIANTS } from "@/lib/data";
+import { slugifyModel } from "@/lib/variant-compare";
 
 // ─── helpers ────────────────────────────────────────────────────────────────
 
@@ -442,6 +445,32 @@ function VariantComparePicker() {
         )}
       </div>
 
+      {/* Smart Insights CTA — shown as soon as a model is chosen */}
+      {selectedGroup && (
+        <Link
+          href={`/model/${slugifyModel(selectedGroup.brand, selectedGroup.model)}/compare`}
+          className="group flex items-center justify-between gap-4 rounded-2xl bg-gradient-to-r from-blue-600 to-violet-600 px-5 py-4 text-white shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 transition-all"
+        >
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white/20">
+              <Sparkles className="h-4 w-4 text-white" />
+            </div>
+            <div>
+              <p className="text-xs font-bold text-blue-200 uppercase tracking-wide">Smart Features</p>
+              <p className="text-sm font-black">
+                Deep Compare: {selectedGroup.brand} {selectedGroup.model}
+              </p>
+              <p className="text-xs text-blue-200 mt-0.5">
+                Radar chart · Decision Score · 5-yr Cost · Break-even · Trim Advisor
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-1 text-sm font-bold shrink-0 group-hover:gap-2 transition-all">
+            Open <ArrowRight className="h-4 w-4" />
+          </div>
+        </Link>
+      )}
+
       {/* Step 2 – variant picker */}
       {selectedGroup && (
         <div>
@@ -625,11 +654,12 @@ function DifferentCarsCompare() {
 
   return (
     <div className="space-y-5">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-3">
         <p className="text-sm text-gray-500">
           {selected.length} car{selected.length > 1 ? "s" : ""} selected (max 3)
         </p>
-        <div className="flex gap-3 items-center">
+        <div className="flex gap-2 items-center flex-wrap">
+          {selected.length >= 2 && <ShareCompareButton cars={selected} />}
           <Button
             size="sm"
             variant="outline"
@@ -696,7 +726,30 @@ function DifferentCarsCompare() {
 
 export default function ComparePage() {
   const [mode, setMode] = useState<CompareMode>("different-cars");
-  const { selected } = useCompare();
+  const { selected, addCar } = useCompare();
+  const searchParams = useSearchParams();
+
+  // Hydrate compare list from shared URL (?cars=id1,id2,id3)
+  useEffect(() => {
+    const param = searchParams.get("cars");
+    if (!param || selected.length > 0) return;
+    const ids = param.split(",").map((s) => s.trim()).filter(Boolean).slice(0, 3);
+    if (ids.length < 2) return;
+    async function hydrate() {
+      for (const id of ids) {
+        try {
+          const res = await fetch(`/api/cars/${id}`);
+          const json = await res.json();
+          if (json.success && json.data) { addCar(json.data); continue; }
+        } catch {}
+        const { CARS, CAR_VARIANTS } = await import("@/lib/data");
+        const found = [...CARS, ...CAR_VARIANTS].find((c) => c.id === id);
+        if (found) addCar(found);
+      }
+    }
+    hydrate();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const tabs: { id: CompareMode; label: string; badge?: string }[] = [
     {

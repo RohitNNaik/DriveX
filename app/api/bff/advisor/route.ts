@@ -1,17 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
-import { advisorExperience } from "@/bff/advisor.api";
+import { getAIAdvisorResponse } from "@/lib/gemini-ai-engine";
 
 /**
  * POST /api/bff/advisor
- * Body: { query: string; city?: string; budget?: number }
+ * Agentic AI advisor using Gemini API
  *
- * Returns AI-recommended cars with explanation text.
- * Uses OpenAI when OPENAI_API_KEY is set; falls back to rule-based engine.
+ * Body: { query: string; city?: string; budget?: number }
  */
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { query, city, budget } = body;
+    const { query } = body;
 
     if (!query?.trim()) {
       return NextResponse.json(
@@ -20,10 +19,15 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const data = await advisorExperience({ query, city, budget });
+    // Use Gemini-powered AI advisor
+    const data = await getAIAdvisorResponse(query);
     return NextResponse.json({ success: true, data });
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Unknown error";
-    return NextResponse.json({ success: false, error: message }, { status: 500 });
+    const message = err instanceof Error ? err.message : "Advisor failed";
+    console.error("Advisor error:", err);
+    return NextResponse.json(
+      { success: false, error: message },
+      { status: 500 }
+    );
   }
 }

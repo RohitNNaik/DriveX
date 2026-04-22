@@ -1,33 +1,49 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createLead, getLeads } from "@/modules/leads/lead.service";
+import { dotnet, DotnetApiError } from "@/lib/dotnet-client";
 
 /**
- * POST /api/leads
- * Body: { carId?, carName?, name, phone, email?, city, message?, intent? }
- * Creates a new dealer/sales lead.
+ * POST /api/leads  — create a lead
+ * GET  /api/leads  — list all leads (internal)
  *
- * GET /api/leads
- * Returns recent leads (internal use only — add auth middleware for production).
+ * Both proxy to the .NET API.
  */
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const lead = await createLead(body);
-    return NextResponse.json({ success: true, data: { id: lead._id } }, { status: 201 });
+    // .NET CreateLeadDto requires: name, phone, city (+ optional carId, carName, intent)
+    // DealerForm sends: name, phone, email (ignored), city, carId?, carName?, intent
+    const { name, phone, city, carId, carName, intent } = body;
+
+    if (!name || !phone || !city) {
+      return NextResponse.json(
+        { success: false, error: "name, phone and city are required" },
+        { status: 400 }
+      );
+    }
+
+    const lead = await dotnet.post<{ id: string }>("/api/leads", {
+      name,
+      phone,
+      city,
+      carId:   carId   ?? null,
+      carName: carName ?? null,
+      intent:  intent  ?? "general",
+    });
+
+    return NextResponse.json({ success: true, data: { id: lead.id } }, { status: 201 });
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Unknown error";
-    return NextResponse.json({ success: false, error: message }, { status: 400 });
+    const message = err instanceof DotnetApiError ? err.message : "Failed to create lead";
+    const status  = err instanceof DotnetApiError ? err.status  : 400;
+    return NextResponse.json({ success: false, error: message }, { status });
   }
 }
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
-    const { searchParams } = req.nextUrl;
-    const status = searchParams.get("status") as "new" | "contacted" | "closed" | null;
-    const leads = await getLeads(status ?? undefined);
-    return NextResponse.json({ success: true, data: leads });
+    const data = await dotnet.get<unknown[]>("/api/leads");
+    return NextResponse.json({ success: true, data });
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Unknown error";
+    const message = err instanceof DotnetApiError ? err.message : "Failed to fetch leads";
     return NextResponse.json({ success: false, error: message }, { status: 500 });
   }
 }

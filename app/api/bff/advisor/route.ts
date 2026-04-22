@@ -1,16 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
-import { dotnet, DotnetApiError } from "@/lib/dotnet-client";
+import { getAIAdvisorResponse } from "@/lib/gemini-ai-engine";
 
 /**
  * POST /api/bff/advisor
- * Proxies to .NET POST /api/bff/advisor.
+ * Agentic AI advisor using Gemini API
  *
  * Body: { query: string; city?: string; budget?: number }
  */
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { query, city, budget } = body;
+    const { query } = body;
 
     if (!query?.trim()) {
       return NextResponse.json(
@@ -19,11 +19,15 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const data = await dotnet.post<unknown>("/api/bff/advisor", { query, city, budget });
+    // Use Gemini-powered AI advisor
+    const data = await getAIAdvisorResponse(query);
     return NextResponse.json({ success: true, data });
   } catch (err) {
-    const message = err instanceof DotnetApiError ? err.message : "Advisor failed";
-    const status  = err instanceof DotnetApiError ? err.status  : 500;
-    return NextResponse.json({ success: false, error: message }, { status });
+    const message = err instanceof Error ? err.message : "Advisor failed";
+    console.error("Advisor error:", err);
+    return NextResponse.json(
+      { success: false, error: message },
+      { status: 500 }
+    );
   }
 }

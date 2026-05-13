@@ -35,12 +35,12 @@ export default function Navbar() {
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 group shrink-0">
           <div className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-blue-700 shadow-lg shadow-blue-500/40 group-hover:shadow-blue-500/60 transition-all duration-300 group-hover:scale-105">
-            <span className="text-white text-lg font-black">D</span>
+            <span className="text-white text-lg font-black">S</span>
             <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-white/20 to-transparent" />
           </div>
           <span className="text-xl font-black tracking-tight">
-            <span className="text-slate-900">Drive</span>
-            <span className="gradient-text-animated">X</span>
+            <span className="text-slate-900">Safa</span>
+            <span className="gradient-text-animated">r</span>
           </span>
         </Link>
 

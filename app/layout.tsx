@@ -7,7 +7,7 @@ import Navbar from "@/components/navbar/Navbar";
 import CompareBar from "@/components/compare-bar/CompareBar";
 
 export const metadata: Metadata = {
-  title: "DriveX – Car Decision Platform",
+  title: "Safar – Car Decision Platform",
   description: "Find, compare and decide your next car with AI-powered recommendations.",
 };
 

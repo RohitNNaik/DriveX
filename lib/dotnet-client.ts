@@ -1,5 +1,5 @@
 /**
- * Thin fetch wrapper for the .NET DriveX API.
+ * Thin fetch wrapper for the .NET Safar API.
  *
  * All calls use server-side fetch (Next.js App Router).
  * The base URL comes from DOTNET_API_URL (env var, server-only).

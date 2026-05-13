@@ -4,6 +4,7 @@ import { CARS } from "./data";
 interface AIResponse {
   text: string;
   suggestions: Car[];
+  responseType?: "greeting" | "recommendation" | "general" | "comparison" | "specification";
 }
 
 interface ExtractedRequirements {
@@ -14,6 +15,94 @@ interface ExtractedRequirements {
   usageScenarios: string[];
   features: string[];
   rawQuery: string;
+}
+
+interface QueryIntent {
+  type: "greeting" | "recommendation" | "general_question" | "comparison" | "specification";
+  isGreeting: boolean;
+  isRecommendation: boolean;
+  isComparison: boolean;
+  isSpecification: boolean;
+  carBrands?: string[];
+}
+
+/**
+ * Detect the intent of the user query
+ */
+function detectQueryIntent(query: string): QueryIntent {
+  const q = query.toLowerCase().trim();
+
+  // Greeting detection
+  const greetingPatterns = /^(hi|hello|hey|greetings?|namaste|what'?s?up|good morning|good afternoon|good evening|howdy)\b/;
+  const isGreeting = greetingPatterns.test(q);
+
+  // Recommendation patterns
+  const recommendationPatterns = /\b(best|recommend|suggest|find|look for|need|want|searching for|looking for)\b/i;
+  const hasRecommendationKeyword = recommendationPatterns.test(q);
+  const hasBudgetOrPreference =
+    /(\d+\s*(?:l|lakh|cr|crore)|electric|diesel|petrol|suv|sedan|family|city|highway)/i.test(q);
+
+  const isRecommendation = hasRecommendationKeyword && hasBudgetOrPreference && !isGreeting;
+
+  // Comparison detection
+  const comparisonPatterns = /\b(compare|vs|versus|difference|better|which is better)\b/i;
+  const isComparison = comparisonPatterns.test(q) && !isGreeting;
+
+  // Specification/Knowledge question detection
+  const specificationPatterns = /\b(what|how|why|tell|explain|feature|spec|specification|mileage|price|cost|engine|power|fuel|consumption)\b/i;
+  const isSpecification = specificationPatterns.test(q) && !isGreeting && !isRecommendation;
+
+  // Extract car brands mentioned
+  const brands = ["maruti", "hyundai", "tata", "toyota", "mahindra", "honda", "volkswagen", "skoda"];
+  const mentionedBrands = brands.filter(b => q.includes(b));
+
+  return {
+    type: isGreeting ? "greeting" : isComparison ? "comparison" : isSpecification ? "specification" : isRecommendation ? "recommendation" : "general_question",
+    isGreeting,
+    isRecommendation,
+    isComparison,
+    isSpecification,
+    carBrands: mentionedBrands,
+  };
+}
+
+/**
+ * Generate greeting response
+ */
+function generateGreetingResponse(): string {
+  const greetings = [
+    "👋 Hi there! Welcome to Safar, your AI-powered car buying assistant!\n\nI'm here to help you find your dream car. I can:\n✅ Recommend cars based on your budget and preferences\n✅ Answer questions about car features, specs, and pricing\n✅ Compare different cars side-by-side\n✅ Help you understand fuel efficiency, safety ratings, and more\n\nWhat are you looking for today? Tell me about your dream car! 🚗",
+    "Hey! 👋 Welcome to your personal car advisor!\n\nWhether you're looking for a budget-friendly hatchback, a spacious family SUV, or an eco-friendly electric car, I've got you covered. Just tell me:\n• Your budget\n• What type of car you want\n• How you'll use it (city, highway, family trips)\n\nAnd I'll find the perfect matches! What's your dream car? 🎯",
+    "Hello! 🚗 Welcome to Safar AI Advisor!\n\nI can help you:\n🔍 Find the best cars matching your needs\n💰 Understand pricing and financing options\n⚡ Learn about different fuel types\n🏠 Get recommendations for city or highway driving\n👨‍👩‍👧‍👦 Find family-friendly vehicles\n\nTell me what you're looking for, and let's find your perfect car! ✨",
+  ];
+
+  return greetings[Math.floor(Math.random() * greetings.length)];
+}
+
+/**
+ * Search database for cars matching criteria
+ */
+function searchCarsInDatabase(query: string, brands?: string[]): Car[] {
+  let filtered = CARS;
+
+  // Filter by mentioned brands
+  if (brands && brands.length > 0) {
+    filtered = filtered.filter(car =>
+      brands.some(b => car.brand.toLowerCase().includes(b))
+    );
+  }
+
+  // Filter by keywords in name
+  const keywords = query.toLowerCase().split(/\s+/).filter(w => w.length > 2);
+  filtered = filtered.filter(car =>
+    keywords.some(k =>
+      car.name.toLowerCase().includes(k) ||
+      car.model.toLowerCase().includes(k) ||
+      car.fuelType.toLowerCase().includes(k)
+    )
+  );
+
+  return filtered.slice(0, 5);
 }
 
 // Initialize Gemini API
@@ -276,8 +365,132 @@ function generateFallbackResponse(
 }
 
 /**
- * Attempt to enhance response with Gemini (graceful fallback)
+ * Answer general car questions using Gemini API with database context
  */
+async function answerGeneralQuestion(
+  query: string,
+  relatedCars: Car[]
+): Promise<string> {
+  try {
+    // Build context from database
+    const carsContext = relatedCars.length > 0
+      ? `\nHere are some relevant cars in our database:\n${relatedCars
+          .map(c => `- ${c.name}: ₹${(c.price / 100000).toFixed(1)}L, ${c.fuelType}, ${c.bodyType}, Rating: ${c.rating}/5`)
+          .join("\n")}`
+      : "";
+
+    const prompt = `You are an expert car advisor with deep knowledge of Indian automobile market. 
+    
+User Question: "${query}"
+${carsContext}
+
+Provide a comprehensive, friendly answer that:
+1. Directly addresses the user's question
+2. Includes practical examples if relevant
+3. Mentions specific cars from the database if applicable
+4. Gives actionable advice
+5. Keeps the tone conversational and helpful
+
+Answer concisely (2-3 sentences) but informatively.`;
+
+    return await callGemini(prompt);
+  } catch (error) {
+    console.error("Failed to answer general question:", error);
+    // Fallback response
+    return "I'm having trouble accessing detailed information right now. Could you rephrase your question or tell me more specifically what car information you need? I can help with recommendations, comparisons, or answer questions about specific cars! 🚗";
+  }
+}
+
+/**
+ * Answer comparison questions
+ */
+async function answerComparisonQuestion(
+  query: string,
+  relatedCars: Car[]
+): Promise<{ text: string; cars: Car[] }> {
+  try {
+    const carsInfo = relatedCars.map(c => ({
+      name: c.name,
+      price: `₹${(c.price / 100000).toFixed(1)}L`,
+      fuelType: c.fuelType,
+      bodyType: c.bodyType,
+      mileage: `${c.mileage} kmpl`,
+      rating: `${c.rating}/5`,
+      pros: c.pros.join(", "),
+      cons: c.cons.join(", "),
+    }));
+
+    const prompt = `You are a car comparison expert. The user asked: "${query}"
+
+Here are the cars to compare:
+${JSON.stringify(carsInfo, null, 2)}
+
+Provide a brief comparison (2-3 sentences) highlighting:
+1. Key differences between the cars
+2. Which is better for what use case
+3. Overall recommendation
+
+Be conversational and helpful.`;
+
+    const response = await callGemini(prompt);
+    return {
+      text: response,
+      cars: relatedCars.slice(0, 3),
+    };
+  } catch (error) {
+    console.error("Failed to answer comparison question:", error);
+    return {
+      text: "I'd be happy to help you compare cars! Could you specify which cars you'd like to compare? For example: 'Compare Hyundai Creta vs Maruti Brezza' 🚗",
+      cars: relatedCars.slice(0, 3),
+    };
+  }
+}
+
+/**
+ * Answer specification/technical questions
+ */
+async function answerSpecificationQuestion(
+  query: string,
+  relatedCars: Car[]
+): Promise<{ text: string; cars: Car[] }> {
+  try {
+    const carsData = relatedCars.map(c => ({
+      name: c.name,
+      engineCC: c.engineCC,
+      power: `${c.power} bhp`,
+      torque: `${c.torque} Nm`,
+      mileage: `${c.mileage} kmpl`,
+      transmission: c.transmission,
+      price: `₹${(c.price / 100000).toFixed(1)}L`,
+      airbags: c.airbags,
+      seating: c.seating,
+    }));
+
+    const prompt = `You are a technical car advisor. Answer this question: "${query}"
+
+Reference data from these cars:
+${JSON.stringify(carsData, null, 2)}
+
+Provide a technical but easy-to-understand answer (2-3 sentences) that:
+1. Explains the concept clearly
+2. Uses examples from the cars if relevant
+3. Gives practical context for the Indian market
+
+Be helpful and conversational.`;
+
+    const response = await callGemini(prompt);
+    return {
+      text: response,
+      cars: relatedCars.slice(0, 3),
+    };
+  } catch (error) {
+    console.error("Failed to answer specification question:", error);
+    return {
+      text: "I'd love to help you understand car specs! Could you be more specific about what you'd like to know? For example: 'What does bhp mean?', 'How is fuel efficiency calculated?', etc. 🔧",
+      cars: relatedCars.slice(0, 3),
+    };
+  }
+}
 async function enhanceResponseWithGemini(
   topCars: Car[],
   query: string
@@ -313,38 +526,84 @@ Write a brief, personalized response (1-2 sentences) explaining why these cars m
 }
 
 /**
- * Main AI advisor function - agentic system with intelligent fallbacks
+ * Main AI advisor function - handles all types of queries
+ * Supports: greetings, recommendations, comparisons, general questions, and specifications
  */
 export async function getAIAdvisorResponse(query: string): Promise<AIResponse> {
   try {
-    // Step 1: Extract requirements using local pattern matching (always reliable)
-    const requirements = extractRequirementsFromText(query);
+    // Detect query intent
+    const intent = detectQueryIntent(query);
 
-    // Step 2: Filter and score cars
-    const allScored = filterAndScoreCars(requirements);
-    const topCars = allScored
-      .filter((s) => s.score > 0)
-      .slice(0, 3)
-      .map((s) => s.car);
-
-    // Step 3: Generate response (try Gemini, fallback to rule-based)
-    let text: string;
-    try {
-      text = await enhanceResponseWithGemini(topCars, query);
-    } catch (error) {
-      console.warn("Using fallback response generation");
-      text = generateFallbackResponse(topCars, requirements);
+    // Handle greeting
+    if (intent.isGreeting) {
+      return {
+        text: generateGreetingResponse(),
+        suggestions: [],
+        responseType: "greeting",
+      };
     }
 
+    // Handle car recommendations
+    if (intent.isRecommendation) {
+      const requirements = extractRequirementsFromText(query);
+      const allScored = filterAndScoreCars(requirements);
+      const topCars = allScored
+        .filter((s) => s.score > 0)
+        .slice(0, 3)
+        .map((s) => s.car);
+
+      let text: string;
+      try {
+        text = await enhanceResponseWithGemini(topCars, query);
+      } catch (error) {
+        console.warn("Using fallback response generation");
+        text = generateFallbackResponse(topCars, requirements);
+      }
+
+      return {
+        text,
+        suggestions: topCars,
+        responseType: "recommendation",
+      };
+    }
+
+    // Handle comparisons
+    if (intent.isComparison) {
+      const relatedCars = searchCarsInDatabase(query, intent.carBrands);
+      const result = await answerComparisonQuestion(query, relatedCars);
+      return {
+        text: result.text,
+        suggestions: result.cars,
+        responseType: "comparison",
+      };
+    }
+
+    // Handle specifications/technical questions
+    if (intent.isSpecification) {
+      const relatedCars = searchCarsInDatabase(query, intent.carBrands);
+      const result = await answerSpecificationQuestion(query, relatedCars);
+      return {
+        text: result.text,
+        suggestions: result.cars,
+        responseType: "specification",
+      };
+    }
+
+    // Handle general questions
+    const relatedCars = searchCarsInDatabase(query, intent.carBrands);
+    const answer = await answerGeneralQuestion(query, relatedCars);
+
     return {
-      text,
-      suggestions: topCars,
+      text: answer,
+      suggestions: relatedCars.slice(0, 3),
+      responseType: "general",
     };
   } catch (error) {
     console.error("AI advisor error:", error);
     return {
-      text: "I encountered an error processing your request. Please try again with a clearer question about your car needs.",
+      text: "I encountered an issue processing your request. Please try asking me about:\n• Car recommendations (e.g., 'Best SUV under 15 lakhs')\n• Car comparisons (e.g., 'Compare Creta vs Brezza')\n• Car specifications (e.g., 'What is fuel efficiency?')\n• General car questions\n\nFeel free to ask anything! 🚗",
       suggestions: [],
+      responseType: "general",
     };
   }
 }

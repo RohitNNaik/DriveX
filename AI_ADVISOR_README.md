@@ -68,7 +68,7 @@ GEMINI_API_KEY=your_gemini_api_key_here
 
 ### Installation
 ```bash
-cd /Users/rohitnaik/DriveX
+cd /Users/rohitnaik/Safar
 npm install
 npm run dev
 ```

@@ -13,7 +13,7 @@ interface GarageContextValue {
 
 const GarageContext = createContext<GarageContextValue | null>(null);
 
-const KEY = "drivex_garage";
+const KEY = "safar_garage";
 
 export function GarageProvider({ children }: { children: ReactNode }) {
   const [saved, setSaved] = useState<Car[]>([]);

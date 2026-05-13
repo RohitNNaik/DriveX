@@ -1,8 +1,8 @@
-# DriveX — Car Decision Platform
+# Safar — Car Decision Platform
 
 > Stop browsing. Start deciding.
 
-DriveX is an intelligent car-buying assistant built with **Next.js 15**, **TypeScript**, **Tailwind CSS v4**, **ShadCN UI**, and a **BFF (Backend For Frontend)** API layer backed by **MongoDB**. It helps users browse cars, compare specs side-by-side, get AI-powered recommendations, calculate EMIs, compare loan offers, and find the best insurance plans — all in one place.
+Safar is an intelligent car-buying assistant built with **Next.js 15**, **TypeScript**, **Tailwind CSS v4**, **ShadCN UI**, and a **BFF (Backend For Frontend)** API layer backed by **MongoDB**. It helps users browse cars, compare specs side-by-side, get AI-powered recommendations, calculate EMIs, compare loan offers, and find the best insurance plans — all in one place.
 
 ---
 
@@ -321,7 +321,7 @@ Edit `.env.local`:
 
 ```env
 # MongoDB — local or Atlas
-MONGODB_URI=mongodb://localhost:27017/drivex
+MONGODB_URI=mongodb://localhost:27017/safar
 
 # Gemini API Key (optional — AI advisor gracefully falls back to rule-based engine without it)
 GEMINI_API_KEY=AIza...

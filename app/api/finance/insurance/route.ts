@@ -1,11 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { computeInsurance } from "@/modules/finance/finance.service";
+import { dotnet, DotnetApiError } from "@/lib/dotnet-client";
 
 /**
  * POST /api/finance/insurance
- * Body: { carPrice, carAge, engineCC, isEV? }
- *
- * Returns ranked insurance recommendations from 6 insurers.
+ * Proxies to .NET POST /api/finance/insurance.
  */
 export async function POST(req: NextRequest) {
   try {
@@ -19,10 +17,16 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const data = computeInsurance({ carPrice, carAge, engineCC, isEV: isEV ?? false });
+    const data = await dotnet.post<unknown>("/api/finance/insurance", {
+      carPrice,
+      carAge,
+      engineCC,
+      isEV: isEV ?? false,
+    });
     return NextResponse.json({ success: true, data });
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Unknown error";
-    return NextResponse.json({ success: false, error: message }, { status: 500 });
+    const message = err instanceof DotnetApiError ? err.message : "Insurance fetch failed";
+    const status  = err instanceof DotnetApiError ? err.status  : 500;
+    return NextResponse.json({ success: false, error: message }, { status });
   }
 }

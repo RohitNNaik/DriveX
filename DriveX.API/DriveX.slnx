@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="DriveX.API/DriveX.API.csproj" />
+  <Project Path="DriveX.Core/DriveX.Core.csproj" />
+  <Project Path="DriveX.Infrastructure/DriveX.Infrastructure.csproj" />
+</Solution>

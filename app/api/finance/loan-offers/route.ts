@@ -1,11 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { computeLoanOffers } from "@/modules/finance/finance.service";
+import { dotnet, DotnetApiError } from "@/lib/dotnet-client";
 
 /**
  * POST /api/finance/loan-offers
- * Body: { carPrice, downPayment, tenureMonths, creditScore? }
- *
- * Returns ranked loan offers from 7 lenders.
+ * Proxies to .NET POST /api/finance/loan-offers.
  */
 export async function POST(req: NextRequest) {
   try {
@@ -19,10 +17,16 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const data = computeLoanOffers({ carPrice, downPayment, tenureMonths, creditScore });
+    const data = await dotnet.post<unknown>("/api/finance/loan-offers", {
+      carPrice,
+      downPayment,
+      tenureMonths,
+      creditScore: creditScore ?? "good",
+    });
     return NextResponse.json({ success: true, data });
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Unknown error";
-    return NextResponse.json({ success: false, error: message }, { status: 500 });
+    const message = err instanceof DotnetApiError ? err.message : "Loan offers failed";
+    const status  = err instanceof DotnetApiError ? err.status  : 500;
+    return NextResponse.json({ success: false, error: message }, { status });
   }
 }

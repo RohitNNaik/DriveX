@@ -1,40 +1,28 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getCars } from "@/modules/car/car.service";
-import { seedCars } from "@/modules/car/car.service";
-import { CarFilters } from "@/modules/car/car.service";
+import { dotnet, DotnetApiError } from "@/lib/dotnet-client";
 
 /**
  * GET /api/cars
- * Query params: isUsed, minPrice, maxPrice, fuelType, bodyType, transmission, brand, limit, skip
+ * Proxies to .NET GET /api/cars with the same query params.
  */
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = req.nextUrl;
+    const params = new URLSearchParams();
 
-    const filters: CarFilters = {
-      isUsed: searchParams.get("isUsed") === "true",
-      fuelType: searchParams.get("fuelType") ?? undefined,
-      bodyType: searchParams.get("bodyType") ?? undefined,
-      transmission: searchParams.get("transmission") ?? undefined,
-      brand: searchParams.get("brand") ?? undefined,
-      minPrice: searchParams.has("minPrice") ? Number(searchParams.get("minPrice")) : undefined,
-      maxPrice: searchParams.has("maxPrice") ? Number(searchParams.get("maxPrice")) : undefined,
-      cityUsage: searchParams.get("cityUsage") === "true",
-      limit: searchParams.has("limit") ? Number(searchParams.get("limit")) : 50,
-      skip: searchParams.has("skip") ? Number(searchParams.get("skip")) : 0,
-    };
+    if (searchParams.get("fuelType"))    params.set("fuelType",  searchParams.get("fuelType")!);
+    if (searchParams.get("bodyType"))    params.set("bodyType",  searchParams.get("bodyType")!);
+    if (searchParams.get("brand"))       params.set("brand",     searchParams.get("brand")!);
+    if (searchParams.get("minPrice"))    params.set("minPrice",  searchParams.get("minPrice")!);
+    if (searchParams.get("maxPrice"))    params.set("maxPrice",  searchParams.get("maxPrice")!);
+    if (searchParams.get("cityUsage") === "true") params.set("usageTag", "City");
 
-    let cars = await getCars(filters);
-
-    // Auto-seed if DB is empty
-    if (cars.length === 0) {
-      await seedCars();
-      cars = await getCars(filters);
-    }
-
-    return NextResponse.json({ success: true, data: cars, total: cars.length });
+    const qs = params.toString();
+    const data = await dotnet.get<unknown[]>(`/api/cars${qs ? `?${qs}` : ""}`);
+    return NextResponse.json({ success: true, data, total: data.length });
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Unknown error";
-    return NextResponse.json({ success: false, error: message }, { status: 500 });
+    const message = err instanceof DotnetApiError ? err.message : "Failed to fetch cars";
+    const status  = err instanceof DotnetApiError ? err.status  : 500;
+    return NextResponse.json({ success: false, error: message }, { status });
   }
 }

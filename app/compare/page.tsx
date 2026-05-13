@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, Suspense, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Check, X as XIcon, Trophy, Loader2, RefreshCw, Sparkles, ArrowRight } from "lucide-react";
@@ -724,7 +724,7 @@ function DifferentCarsCompare() {
 
 // ─── Page ──────────────────────────────────────────────────────────────────────
 
-export default function ComparePage() {
+function ComparePageContent() {
   const [mode, setMode] = useState<CompareMode>("different-cars");
   const { selected, addCar } = useCompare();
   const searchParams = useSearchParams();
@@ -796,6 +796,14 @@ export default function ComparePage() {
       {/* Content */}
       {mode === "different-cars" ? <DifferentCarsCompare /> : <VariantComparePicker />}
     </div>
+  );
+}
+
+export default function ComparePage() {
+  return (
+    <Suspense fallback={<div className="mx-auto max-w-7xl px-4 sm:px-6 py-8"><Loader2 className="h-8 w-8 animate-spin" /></div>}>
+      <ComparePageContent />
+    </Suspense>
   );
 }
 

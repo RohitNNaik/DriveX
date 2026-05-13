@@ -1,0 +1,9 @@
+[submodule "backend"]
+	path = backend
+	url = https://github.com/RohitNNaik/DriveX.git
+	branch = backend
+
+[submodule "drivex"]
+	path = drivex
+	url = https://github.com/RohitNNaik/DriveX.git
+	branch = main

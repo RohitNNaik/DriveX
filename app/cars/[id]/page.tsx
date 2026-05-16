@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { CARS, CAR_VARIANTS } from "@/lib/data";
+import { CAR_VARIANTS } from "@/lib/data";
 import { Car } from "@/lib/types";
 import OnRoadPrice from "@/components/onroad-price/OnRoadPrice";
 import BuySignal from "@/components/buy-signal/BuySignal";
@@ -34,11 +34,9 @@ async function getCar(id: string): Promise<Car | null> {
     const res = await fetch(`${base}/api/cars/${id}`, { cache: "no-store" });
     if (res.ok) return await res.json() as Car;
   } catch {
-    // fall through
+    return null;
   }
-  return (
-    [...CARS, ...CAR_VARIANTS].find((c) => c.id === id) ?? null
-  );
+  return null;
 }
 
 function hasVariants(car: Car) {

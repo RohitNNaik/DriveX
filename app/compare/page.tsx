@@ -64,58 +64,6 @@ const STATIC_SPEC_ROWS: Array<{
   { label: "Transmission", field: "transmission", fmt: (v) => String(v), higherIsBetter: false },
 ];
 
-// ─── Utility: build static variant result ────────────────────────────────────
-
-function buildStaticVariantResult(ids: string[]): CompareResult | null {
-  const cars = ids.map((id) => CAR_VARIANTS.find((c) => c.id === id)).filter(Boolean) as Car[];
-  if (cars.length < 2) return null;
-
-  const table = STATIC_SPEC_ROWS.map((row) => {
-    const rawVals = cars.map((c) => c[row.field]);
-    const fmtVals = rawVals.map((v) => row.fmt(v));
-    const nums = rawVals.map((v) => (typeof v === "number" ? v : NaN));
-    let winner: number | undefined;
-    if (!nums.some(isNaN) && !nums.every((n) => n === nums[0])) {
-      const target = row.higherIsBetter ? Math.max(...nums) : Math.min(...nums);
-      winner = nums.indexOf(target);
-    }
-    return { label: row.label, values: fmtVals, winner };
-  });
-
-  const scores = new Array<number>(cars.length).fill(0);
-  for (const row of STATIC_SPEC_ROWS) {
-    if (!row.higherIsBetter && row.field !== "price") continue;
-    const vals = cars.map((c) => c[row.field] as number);
-    if (vals.some((v) => typeof v !== "number")) continue;
-    const target = row.higherIsBetter ? Math.max(...vals) : Math.min(...vals);
-    const wi = vals.indexOf(target);
-    if (!vals.every((v) => v === vals[0])) scores[wi]++;
-  }
-  const winnerIdx = scores.indexOf(Math.max(...scores));
-  const winnerCar = cars[winnerIdx];
-  const winnerLabel = winnerCar.variant ?? winnerCar.name;
-  const cheapest = cars.reduce((a, b) => (a.price < b.price ? a : b));
-  const priceDiff = Math.max(...cars.map((c) => c.price)) - Math.min(...cars.map((c) => c.price));
-
-  return {
-    mode: "same-model-variants",
-    winner: winnerLabel,
-    insights: [
-      `${cheapest.variant ?? cheapest.name} is the most affordable variant`,
-      `Price gap across variants: ₹${priceDiff.toLocaleString("en-IN")}`,
-    ],
-    table,
-    cars: cars.map((c) => ({
-      name: c.name,
-      variant: c.variant ?? c.name,
-      brand: c.brand,
-      price: c.price,
-      fuelType: c.fuelType,
-      transmission: c.transmission,
-    })),
-  };
-}
-
 // ─── Shared: insight banner ───────────────────────────────────────────────────
 
 function InsightBanner({ winner, insights }: { winner: string; insights: string[] }) {
@@ -286,22 +234,6 @@ function VariantProsCons({
   );
 }
 
-function getStaticVariants(brand: string, model: string): VariantSummary[] {
-  return CAR_VARIANTS.filter(
-    (c) =>
-      c.brand.toLowerCase() === brand.toLowerCase() &&
-      c.model.toLowerCase() === model.toLowerCase()
-  ).map((c) => ({
-    id: c.id,
-    brand: c.brand,
-    model: c.model,
-    variant: c.variant ?? c.name,
-    fuelType: c.fuelType,
-    transmission: c.transmission,
-    price: c.price,
-  }));
-}
-
 function VariantComparePicker() {
   const [modelGroups, setModelGroups] = useState<ModelGroup[]>([]);
   const [selectedGroup, setSelectedGroup] = useState<ModelGroup | null>(null);
@@ -325,19 +257,8 @@ function VariantComparePicker() {
           throw new Error("No data");
         }
       } catch {
-        const map = new Map<string, number>();
-        for (const car of CAR_VARIANTS) {
-          const key = `${car.brand}::${car.model}`;
-          map.set(key, (map.get(key) ?? 0) + 1);
-        }
-        setModelGroups(
-          Array.from(map.entries())
-            .filter(([, count]) => count >= 2)
-            .map(([key, count]) => {
-              const [brand, model] = key.split("::");
-              return { brand, model, variantCount: count };
-            })
-        );
+        setError("Failed to load models. Please try again.");
+        setModelGroups([]);
       } finally {
         setLoadingModels(false);
       }
@@ -370,10 +291,10 @@ function VariantComparePicker() {
             }))
           );
         } else {
-          setAvailableVariants(getStaticVariants(selectedGroup.brand, selectedGroup.model));
+          setAvailableVariants([]);
         }
       } catch {
-        setAvailableVariants(getStaticVariants(selectedGroup.brand, selectedGroup.model));
+        setAvailableVariants([]);
       } finally {
         setLoadingVariants(false);
       }
@@ -402,14 +323,10 @@ function VariantComparePicker() {
       if (json.success) {
         setResult(json.data);
       } else {
-        const fallback = buildStaticVariantResult(pickedIds);
-        if (fallback) setResult(fallback);
-        else setError(json.error ?? "Comparison failed");
+        setError(json.error ?? "Comparison failed");
       }
     } catch {
-      const fallback = buildStaticVariantResult(pickedIds);
-      if (fallback) setResult(fallback);
-      else setError("Network error. Please try again.");
+      setError("Network error. Please try again.");
     } finally {
       setComparing(false);
     }
@@ -740,11 +657,8 @@ function ComparePageInner() {
         try {
           const res = await fetch(`/api/cars/${id}`);
           const json = await res.json();
-          if (json.success && json.data) { addCar(json.data); continue; }
+          if (json.success && json.data) addCar(json.data);
         } catch {}
-        const { CARS, CAR_VARIANTS } = await import("@/lib/data");
-        const found = [...CARS, ...CAR_VARIANTS].find((c) => c.id === id);
-        if (found) addCar(found);
       }
     }
     hydrate();

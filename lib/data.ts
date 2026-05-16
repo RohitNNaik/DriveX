@@ -131,7 +131,7 @@ export const CARS: Car[] = [
     rating: 4.5,
     pros: ["Powerful diesel", "7-seater", "4WD option", "5-star NCAP"],
     cons: ["NVH could be better", "Large footprint for city"],
-    tags: ["Highway", "Off-road", "Family"],
+    tags: ["Highway", "OffRoad", "Family"],
   },
   {
     id: "toyota-innova-crysta-2024",
@@ -585,6 +585,6 @@ export const CAR_VARIANTS: Car[] = [
     rating: 4.6,
     pros: ["Real 4WD off-road", "7-seater", "5-star NCAP", "All bells & whistles"],
     cons: ["Expensive", "Large city footprint"],
-    tags: ["Highway", "Off-road", "Family"],
+    tags: ["Highway", "OffRoad", "Family"],
   },
 ];

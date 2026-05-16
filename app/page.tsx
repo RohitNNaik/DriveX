@@ -520,7 +520,10 @@ export default function HomePage() {
             {/* Brand */}
             <div className="flex items-center gap-2">
               <Image src="/safar-icon.svg" alt="Safaar" width={30} height={30} className="rounded-lg" />
-              <span className="font-black text-lg text-slate-900">Safaar</span>
+              <div className="flex flex-col leading-none">
+                <span className="font-black text-lg text-slate-900">Safaar</span>
+                <span className="text-[9px] font-semibold tracking-[0.2em] text-[#5A7BA8] uppercase mt-0.5">Find · Compare · Decide</span>
+              </div>
             </div>
 
             {/* Links */}

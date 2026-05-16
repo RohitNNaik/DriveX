@@ -432,12 +432,12 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── Why Safar ────────────────────────────────────────────── */}
+      {/* ── Why Safaar ──────────────────────────────────────────── */}
       <section className="mx-auto w-full max-w-7xl px-4 sm:px-6 py-16">
         <div className="text-center mb-10">
           <span className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-blue-50 to-violet-50 border border-blue-200/60 px-4 py-1 text-xs font-black text-blue-700 mb-3">
             <Star className="h-3 w-3 fill-blue-600" />
-            WHY SAFAR
+            WHY SAFAAR
           </span>
           <h2 className="text-2xl sm:text-3xl font-black text-slate-900">Built for smart Indian car buyers</h2>
           <p className="text-slate-500 mt-1 max-w-xl mx-auto">No ads. No dealer pressure. Just the right car at the right price.</p>
@@ -519,8 +519,8 @@ export default function HomePage() {
           <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
             {/* Brand */}
             <div className="flex items-center gap-2">
-              <Image src="/safar-icon.svg" alt="Safar" width={30} height={30} className="rounded-lg" />
-              <span className="font-black text-lg text-slate-900">Safar</span>
+              <Image src="/safar-icon.svg" alt="Safaar" width={30} height={30} className="rounded-lg" />
+              <span className="font-black text-lg text-slate-900">Safaar</span>
             </div>
 
             {/* Links */}
@@ -539,7 +539,7 @@ export default function HomePage() {
             </div>
 
             <p className="text-xs text-slate-400">
-              © {new Date().getFullYear()} Safar. Built for smart car buyers.
+              © {new Date().getFullYear()} Safaar. Built for smart car buyers.
             </p>
           </div>
         </div>

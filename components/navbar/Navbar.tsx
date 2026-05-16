@@ -43,7 +43,7 @@ export default function Navbar() {
               <span className="text-slate-900">Safaa</span>
               <span className="gradient-text-animated">r</span>
             </span>
-            <span className="text-[8px] font-semibold tracking-[0.2em] text-[#5A7BA8] uppercase mt-0.5">Find · Compare · Decide</span>
+            <span className="text-[7px] font-semibold tracking-[0.2em] text-[#5A7BA8] uppercase mt-0.5">Find · Compare · Decide</span>
           </div>
         </Link>
 

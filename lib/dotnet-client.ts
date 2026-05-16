@@ -9,7 +9,7 @@
  * suppresses that — dev only, never do this in production.
  */
 
-const BASE = process.env.DOTNET_API_URL ?? "https://safaar-backend.onrender.com/";
+const BASE = (process.env.DOTNET_API_URL ?? "https://safaar-backend.onrender.com").replace(/\/$/, "");
 
 type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 

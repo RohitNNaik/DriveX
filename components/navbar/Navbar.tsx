@@ -36,12 +36,15 @@ export default function Navbar() {
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 group shrink-0">
           <div className="relative group-hover:scale-105 transition-all duration-300">
-            <Image src="/safar-icon.svg" alt="Safar" width={36} height={36} className="rounded-xl shadow-lg shadow-blue-500/40 group-hover:shadow-blue-500/60" />
+            <Image src="/safar-icon.svg" alt="Safaar" width={36} height={36} className="rounded-xl shadow-lg shadow-blue-500/40 group-hover:shadow-blue-500/60" />
           </div>
-          <span className="text-xl font-black tracking-tight">
-            <span className="text-slate-900">Safa</span>
-            <span className="gradient-text-animated">r</span>
-          </span>
+          <div className="flex flex-col leading-none">
+            <span className="text-xl font-black tracking-tight">
+              <span className="text-slate-900">Safaa</span>
+              <span className="gradient-text-animated">r</span>
+            </span>
+            <span className="text-[7px] font-semibold tracking-[0.2em] text-[#5A7BA8] uppercase mt-0.5">Find · Compare · Decide</span>
+          </div>
         </Link>
 
         {/* Desktop nav */}

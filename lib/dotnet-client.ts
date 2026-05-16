@@ -1,5 +1,5 @@
 /**
- * Thin fetch wrapper for the .NET Safar API.
+ * Thin fetch wrapper for the .NET Safaar API.
  *
  * All calls use server-side fetch (Next.js App Router).
  * The base URL comes from DOTNET_API_URL (env var, server-only).
@@ -9,7 +9,7 @@
  * suppresses that — dev only, never do this in production.
  */
 
-const BASE = process.env.DOTNET_API_URL ?? "https://localhost:60173";
+const BASE = process.env.DOTNET_API_URL ?? "https://safaar-backend.onrender.com/";
 
 type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 

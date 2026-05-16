@@ -74,7 +74,7 @@ async function openAIAdvisor(query: string, input: AdvisorInput): Promise<Adviso
     )
     .join("\n");
 
-  const systemPrompt = `You are Safar AI, India's smartest car advisor. 
+  const systemPrompt = `You are Safaar AI, India's smartest car advisor. 
 You have access to this car catalogue:
 ${carCatalogue}
 

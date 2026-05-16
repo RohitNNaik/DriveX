@@ -30,7 +30,7 @@ function formatPrice(price: number) {
 async function getCar(id: string): Promise<Car | null> {
   // Try API first, fall back to static data
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000"}/api/cars/${id}`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL ?? "https://safaar-backend.onrender.com"}/api/cars/${id}`, {
       cache: "no-store",
     });
     const json = await res.json();

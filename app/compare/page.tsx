@@ -360,7 +360,7 @@ function VariantComparePicker() {
         if (json.success && json.data.length >= 2) {
           setAvailableVariants(
             json.data.map((c: Car & { _id?: string }) => ({
-              id: String(c._id ?? c.id),
+              id: String(c.id),
               brand: c.brand,
               model: c.model,
               variant: c.variant ?? c.name,

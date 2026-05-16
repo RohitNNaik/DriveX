@@ -35,7 +35,7 @@ public class CarService : ICarService
     {
         var cars = await _repo.GetVariantsByModelAsync(brand, model, ct);
         return cars.Select(c => new VariantSummaryDto(
-            c.Id ?? c.Slug,
+            c.Slug,   // slug is used by CompareVariantsAsync → GetBySlugAsync
             c.Brand,
             c.Model,
             c.Variant ?? c.Name,
@@ -57,7 +57,7 @@ public class CarService : ICarService
                 g.Key.Brand,
                 g.Key.Model,
                 g.Select(c => new VariantSummaryDto(
-                    c.Id ?? c.Slug,
+                    c.Slug,   // slug is used by CompareVariantsAsync → GetBySlugAsync
                     c.Brand,
                     c.Model,
                     c.Variant!,

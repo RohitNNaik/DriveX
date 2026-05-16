@@ -1,0 +1,32 @@
+# Agentic Workflow - Selective Git Tracking
+# All stage artifacts are preserved for post-session analysis.
+
+# Ignore everything by default
+*
+
+# Track all artifact stage directories
+!artifacts/
+!artifacts/*/
+!artifacts/*/00-prd/
+!artifacts/*/01-requirements/
+!artifacts/*/02-design/
+!artifacts/*/03-security/
+!artifacts/*/04-test-planning/
+!artifacts/*/05-implementation/
+!artifacts/*/06-code-review/
+!artifacts/*/07-integration-testing/
+!artifacts/*/08-performance/
+!artifacts/*/09-review-fixes/
+!artifacts/*/10-documentation/
+!artifacts/*/11-observability/
+!artifacts/*/12-deployment/
+
+# Track all markdown and JSON artifacts in any stage directory
+!artifacts/*/**/*.md
+!artifacts/*/**/*.json
+
+# Keep the trace log
+!artifacts/*/trace.ndjson
+
+# Keep this .gitignore
+!.gitignore

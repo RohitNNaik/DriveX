@@ -1,4 +1,3 @@
-import { USED_CARS } from "@/lib/data";
 import CarCard from "@/components/car-card/CarCard";
 import type { Car } from "@/lib/types";
 import { Shield, CheckCircle, FileText, RefreshCw } from "lucide-react";
@@ -7,11 +6,10 @@ async function fetchUsedCars(): Promise<Car[]> {
   try {
     const { getUsedCars } = await import("@/modules/usedCars/usedCar.service");
     const cars = await getUsedCars();
-    if (cars.length > 0) return cars as unknown as Car[];
+    return cars as unknown as Car[];
   } catch {
-    // MongoDB not available — fall back to static data
+    return [];
   }
-  return USED_CARS;
 }
 
 const TRUST_BADGES = [

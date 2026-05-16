@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { CARS } from "@/lib/data";
 import CarCard from "@/components/car-card/CarCard";
 import Filters, { FilterState } from "@/components/filters/Filters";
 import { Car } from "@/lib/types";
@@ -13,16 +12,6 @@ const DEFAULT_FILTERS: FilterState = {
   bodyType: "All",
   cityUsage: false,
 };
-
-function filterStatic(f: FilterState): Car[] {
-  return CARS.filter((car) => {
-    if (car.price > f.maxBudget) return false;
-    if (f.fuelType !== "All" && car.fuelType !== f.fuelType) return false;
-    if (f.bodyType !== "All" && car.bodyType !== f.bodyType) return false;
-    if (f.cityUsage && !car.tags.includes("City")) return false;
-    return true;
-  });
-}
 
 export default function CarsPage() {
   const [filters, setFilters] = useState<FilterState>(DEFAULT_FILTERS);
@@ -40,9 +29,9 @@ export default function CarsPage() {
 
       const res = await fetch(`/api/cars?${params}`);
       const json = await res.json();
-      setCars(json.success ? json.data : filterStatic(f));
+      setCars(json.success ? json.data : []);
     } catch {
-      setCars(filterStatic(f));
+      setCars([]);
     } finally {
       setLoading(false);
     }

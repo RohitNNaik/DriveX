@@ -28,13 +28,11 @@ function formatPrice(price: number) {
 }
 
 async function getCar(id: string): Promise<Car | null> {
-  // Try API first, fall back to static data
+  // Try .NET API first (returns CarDto directly, no { success, data } wrapper)
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL ?? "https://safaar-backend.onrender.com"}/api/cars/${id}`, {
-      cache: "no-store",
-    });
-    const json = await res.json();
-    if (json.success && json.data) return json.data as Car;
+    const base = process.env.DOTNET_API_URL ?? "https://safaar-backend.onrender.com";
+    const res = await fetch(`${base}/api/cars/${id}`, { cache: "no-store" });
+    if (res.ok) return await res.json() as Car;
   } catch {
     // fall through
   }

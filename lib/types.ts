@@ -5,6 +5,7 @@ export type UsageTag = "City" | "Highway" | "Family" | "Off-road" | "Budget";
 
 export interface Car {
   id: string;
+  slug?: string;  // human-readable slug from API (e.g. "hyundai-creta-2024")
   name: string;
   brand: string;
   model: string;

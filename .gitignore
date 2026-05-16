@@ -50,3 +50,5 @@ next-env.d.ts
 /.vs
 /.vs
 /.vs/slnx.sqlite
+/drivex.cars.csv
+/drivex.cars.json

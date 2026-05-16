@@ -1,7 +1,7 @@
 export type FuelType = "Petrol" | "Diesel" | "Electric" | "Hybrid" | "CNG";
 export type TransmissionType = "Manual" | "Automatic";
 export type BodyType = "SUV" | "Sedan" | "Hatchback" | "MPV" | "Coupe";
-export type UsageTag = "City" | "Highway" | "Family" | "Off-road" | "Budget";
+export type UsageTag = "City" | "Highway" | "Family" | "OffRoad" | "Budget";
 
 export interface Car {
   id: string;

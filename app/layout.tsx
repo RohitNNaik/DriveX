@@ -7,13 +7,8 @@ import Navbar from "@/components/navbar/Navbar";
 import CompareBar from "@/components/compare-bar/CompareBar";
 
 export const metadata: Metadata = {
-  title: "Safar – Car Decision Platform",
+  title: "Safaar – Car Decision Platform",
   description: "Find, compare and decide your next car with AI-powered recommendations.",
-  icons: {
-    icon: "/safar-icon.svg",
-    shortcut: "/safar-icon.svg",
-    apple: "/safar-icon.svg",
-  },
 };
 
 export default function RootLayout({

@@ -71,9 +71,9 @@ function detectQueryIntent(query: string): QueryIntent {
  */
 function generateGreetingResponse(): string {
   const greetings = [
-    "👋 Hi there! Welcome to Safar, your AI-powered car buying assistant!\n\nI'm here to help you find your dream car. I can:\n✅ Recommend cars based on your budget and preferences\n✅ Answer questions about car features, specs, and pricing\n✅ Compare different cars side-by-side\n✅ Help you understand fuel efficiency, safety ratings, and more\n\nWhat are you looking for today? Tell me about your dream car! 🚗",
+    "👋 Hi there! Welcome to Safaar, your AI-powered car buying assistant!\n\nI'm here to help you find your dream car. I can:\n✅ Recommend cars based on your budget and preferences\n✅ Answer questions about car features, specs, and pricing\n✅ Compare different cars side-by-side\n✅ Help you understand fuel efficiency, safety ratings, and more\n\nWhat are you looking for today? Tell me about your dream car! 🚗",
     "Hey! 👋 Welcome to your personal car advisor!\n\nWhether you're looking for a budget-friendly hatchback, a spacious family SUV, or an eco-friendly electric car, I've got you covered. Just tell me:\n• Your budget\n• What type of car you want\n• How you'll use it (city, highway, family trips)\n\nAnd I'll find the perfect matches! What's your dream car? 🎯",
-    "Hello! 🚗 Welcome to Safar AI Advisor!\n\nI can help you:\n🔍 Find the best cars matching your needs\n💰 Understand pricing and financing options\n⚡ Learn about different fuel types\n🏠 Get recommendations for city or highway driving\n👨‍👩‍👧‍👦 Find family-friendly vehicles\n\nTell me what you're looking for, and let's find your perfect car! ✨",
+    "Hello! 🚗 Welcome to Safaar AI Advisor!\n\nI can help you:\n🔍 Find the best cars matching your needs\n💰 Understand pricing and financing options\n⚡ Learn about different fuel types\n🏠 Get recommendations for city or highway driving\n👨‍👩‍👧‍👦 Find family-friendly vehicles\n\nTell me what you're looking for, and let's find your perfect car! ✨",
   ];
 
   return greetings[Math.floor(Math.random() * greetings.length)];
